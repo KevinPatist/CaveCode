@@ -1,0 +1,21 @@
+fdooga add hoooga a komooga b hsooga broooga booga
+    retooga a plooga b booga
+brsooga
+
+fdooga main hoooga hsooga broooga booga
+    retooga add hoooga 1 komooga 2 hsooga booga
+brsooga
+
+main hoooga hsooga booga
+
+aka
+
+def add(a,b) {
+    return a + b;
+}
+
+def main() {
+    return add(1,2);
+}
+
+main();
