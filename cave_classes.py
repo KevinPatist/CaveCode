@@ -3,7 +3,7 @@ import io
 import os
 
 from enum import Enum
-from typing import Tuple, TypeVar, List, Type
+from typing import Tuple, TypeVar, List, Type, Callable
 
 class TokenTypes(Enum):
     ADD      = "plooga"
@@ -43,5 +43,5 @@ class Token:
         return self.__repr__()
 
     def __repr__(self) -> str:
-        return f"(value: \"{self.value}\", type
+        return f"(value: \"{self.content}\", type: {self.token_type}, position: {self.position}\n"
 
