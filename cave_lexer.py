@@ -58,7 +58,6 @@ def lineToKeywords(line: str) -> List[Tuple[int,str]]:
     return enum_line
 
 
-
 A = TypeVar('A')
 B = TypeVar('B')
 C = TypeVar('C')
@@ -70,15 +69,17 @@ def tokenMap(func: Callable[[A, B], C], keywords_list: List[Tuple[int,str]], lin
         head, *tail = keywords_list
         return [func(head, linenr)] + tokenMap(func, tail, linenr)
 
+
 def keywordsToToken(keywords_list: Tuple[int,List[Tuple[int,str]]]) -> List[Token]:
     #(linenr,[(pos,keyword),(pos,keyword)...])
     tokens_list = list(tokenMap(toToken, keywords_list[1], keywords_list[0]))
     return tokens_list
 
+
 def flattenTokenList(token_list: List[List[Token]]) -> List[Token]:
-    flat_list = []
-    list(map(flat_list.extend, token_list))
+    flat_list = reduce(lambda x, y: x + y, token_list)
     return flat_list
+
 
 def caveLexer(code_text: List[List[str]], token_types: Type[Enum] = TokenTypes) -> List[Token]:
     keywords = []
