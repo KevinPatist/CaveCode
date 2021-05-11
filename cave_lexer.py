@@ -87,12 +87,3 @@ def caveLexer(code_text: List[List[str]], token_types: Type[Enum] = TokenTypes) 
     token_list = list(map(keywordsToToken, keywords))
     flat_token_list = flattenTokenList(token_list)
     return flat_token_list
-
-
-def main():
-    code = open("cave_code.txt", "r")
-    code_text = code.readlines()
-    code.close()
-    print(caveLexer(code_text))
-
-main()

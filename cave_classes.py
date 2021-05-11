@@ -3,7 +3,7 @@ import io
 import os
 
 from enum import Enum
-from typing import Tuple, TypeVar, List, Type, Callable
+from typing import Tuple, TypeVar, List, Type, Callable, Union, Optional, Dict
 from functools import reduce
 
 class TokenTypes(Enum):
@@ -36,7 +36,7 @@ class Token:
     def __init__(self, token_type: Type[Enum], value: str, position: Tuple[int,int]):
         """Creates a Token object which contains the tokens type, its value and its position within the code"""
         self.token_type = token_type
-        self.content = value
+        self.content = value if not value.isdigit() else int(value)
         self.position = position
 
     def __str__(self) -> str:
@@ -72,20 +72,7 @@ class ValueNode(Node):
 
 
 class VariableNode(ValueNode):
-    """ Node used to store variable names """
-    def __init__(self, token: Token):
-        ValueNode.__init__(self, token.position)
-        self.name = token.content
-
-    def __str__(self) -> str:
-        return self.__repr__()
-
-    def __repr__(self) -> str:
-        return f"{self.name}"
-
-
-class NumNode(ValueNode):
-    """ Node used to store numbers """
+    """ Node used to store integers and strings """
     def __init__(self, token: Token):
         ValueNode.__init__(self, token.position)
         self.value = token.content
@@ -167,10 +154,23 @@ class IfOrWhileNode(ActionNode):
         return f"condition: {self.condition}, actions: {self.action_list}, loop: {self.is_loop}"
 
 
+class ReturnNode(ActionNode):
+    """ A node used to return stuff """
+    def __init__(self, value: ValueNode):
+        ActionNode.__init__(self, value.position)
+        self.return_value = value
+
+    def __str__(self) -> str:
+        return self.__repr__()
+    
+    def __repr__(self) -> str:
+        return f"return value: {self.return_value}"
+        
+
 class FunctionDefNode(Node):
     """ Node used to store functions with parameters and instructions """
     def __init__(self, token: Token, parameters: Dict[str, int], action_list: List[ActionNode]):
-        Node.__init__(self, name.position)
+        Node.__init__(self, token.position)
         self.name = token.content
         self.parameters = parameters
         self.action_list = action_list

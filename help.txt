@@ -1,0 +1,49 @@
+
+def add(a,b):
+    return a+b
+
+def main():
+    if 1 >= 0:
+        return add(1,2)
+
+
+[Function add, 
+    with parameters: 
+        {'a': 0, 'b': 0} 
+
+    and actions: 
+        [return value: lhs: a, operator: TokenTypes.ADD, rhs: b], 
+
+ Function main, 
+    with parameters: 
+        {} 
+    and actions: 
+        [condition: lhs: 1, operator: TokenTypes.GREQ, rhs: 0, 
+         actions: 
+            [return value: 
+                function name: add, parameters: [(value: "1", type: TokenTypes.NUMBER, position: (7, 4), (value: "2", type: TokenTypes.NUMBER, position: (7, 6)]
+        ], loop: False]
+]
+
+
+
+{
+'add': 
+    Function add, 
+        with parameters: {'a': 0, 'b': 0} 
+        and actions: 
+            [return value: lhs: a, operator: TokenTypes.ADD, rhs: b],
+
+'main': 
+    Function main, 
+        with parameters: {} 
+        and actions: 
+            [condition: lhs: 1, operator: TokenTypes.GREQ, rhs: 2, 
+                actions: 
+                    [return value: function name: add, 
+                                    parameters: 
+                                    [(value: "1", type: TokenTypes.NUMBER, position: (7, 4), (value: "2", type: TokenTypes.NUMBER, position: (7, 6)]
+                    ], loop: False, 
+                    [return value: 0]
+            ]
+}
