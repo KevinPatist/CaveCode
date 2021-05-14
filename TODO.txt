@@ -1,0 +1,11 @@
+- commenten
+- readme maken
+- turingcompleetheid aantonen
+- heeft dcDecorator
+- haskell zooi boven functies tyfen
+- hogere orde functies laten zien
+- video maken waarin ik de structuur uitleg van mn taal, interpreter en laat zien hoe die gebruikt wordt
+
+functionaliteiten:
+- HEEFT ERROR MESSAGING
+- 

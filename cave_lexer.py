@@ -1,5 +1,6 @@
 from cave_classes import *
 
+@dcDecorator
 def toToken(keyword_tup: Tuple[int,str], linenr: int) -> Token:
     if keyword_tup[1] == "plooga":
         return Token(TokenTypes.ADD, "plooga", (linenr, keyword_tup[0]))
@@ -51,6 +52,7 @@ def toToken(keyword_tup: Tuple[int,str], linenr: int) -> Token:
         return Token(TokenTypes.ID, keyword_tup[1], (linenr, keyword_tup[0]))
     
 
+@dcDecorator
 def lineToKeywords(line: str) -> List[Tuple[int,str]]:
     line = line.strip()
     line = line.split()
@@ -62,6 +64,7 @@ A = TypeVar('A')
 B = TypeVar('B')
 C = TypeVar('C')
 
+@dcDecorator
 def tokenMap(func: Callable[[A, B], C], keywords_list: List[Tuple[int,str]], linenr: int) -> List[Token]:
     if len(keywords_list) == 0:
         return []
@@ -70,17 +73,19 @@ def tokenMap(func: Callable[[A, B], C], keywords_list: List[Tuple[int,str]], lin
         return [func(head, linenr)] + tokenMap(func, tail, linenr)
 
 
+@dcDecorator
 def keywordsToToken(keywords_list: Tuple[int,List[Tuple[int,str]]]) -> List[Token]:
-    #(linenr,[(pos,keyword),(pos,keyword)...])
     tokens_list = list(tokenMap(toToken, keywords_list[1], keywords_list[0]))
     return tokens_list
 
 
+@dcDecorator
 def flattenTokenList(token_list: List[List[Token]]) -> List[Token]:
     flat_list = reduce(lambda x, y: x + y, token_list)
     return flat_list
 
 
+@dcDecorator
 def caveLexer(code_text: List[List[str]], token_types: Type[Enum] = TokenTypes) -> List[Token]:
     keywords = []
     keywords = list(enumerate(map(lineToKeywords, code_text), 1))

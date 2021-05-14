@@ -5,6 +5,13 @@ import os
 from enum import Enum
 from typing import Tuple, TypeVar, List, Type, Callable, Union, Optional, Dict
 from functools import reduce
+from copy import deepcopy
+
+
+def dcDecorator(function):
+    def inside(*args):
+        return function(*list(map(lambda element: deepcopy(element), args)))
+    return inside
 
 class TokenTypes(Enum):
     ADD      = "plooga"

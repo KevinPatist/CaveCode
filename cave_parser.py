@@ -14,6 +14,7 @@ class ParseError(Exception):
             super().__init__(f"Expected {self.wanted}, but got nothing.")
 
 
+@dcDecorator
 def isFirst(token_list: List[Token], token_type: List[TokenTypes]) -> bool:
     """ Checks if the first item in token_list has a type in token_type
         Returns True is the first item in token_list is of a given token type """
@@ -22,6 +23,7 @@ def isFirst(token_list: List[Token], token_type: List[TokenTypes]) -> bool:
     raise ParseError(f"isFirst wanted tokens of types: [{token_type}]", token_list[0] if len(token_list) != 0 else None)
 
 
+@dcDecorator
 def getToken(token_list: List[Token], wanted_types: List[TokenTypes]) -> Tuple[Token, List[Token]]:
     """ if the first token in the list is of the wanted TokenType this function returns the first token as well as the remaining list 
         If the first token isn't of the wanted type, and error is raised """
@@ -31,6 +33,7 @@ def getToken(token_list: List[Token], wanted_types: List[TokenTypes]) -> Tuple[T
         raise ParseError(f"getToken wanted TokenTypes: {wanted_types}", token_list[0])
 
 
+@dcDecorator
 def getParameters(token_list: List[Token]) -> Tuple[Dict[str, int], List[Token]]:
     if isFirst(token_list, [TokenTypes.ID]):
         parameters = {token_list.pop(0).content: 0}
@@ -46,6 +49,7 @@ def getParameters(token_list: List[Token]) -> Tuple[Dict[str, int], List[Token]]
         raise ParseError(f"getParameters wanted Token of types: [ID, SEP or CLOSEPAR]", token_list[0] if len(token_list) != 0 else None)
         
 
+@dcDecorator
 def getCallParameters(token_list: List[Token]) -> Tuple[List[Union[int, str, float]], List[Token]]:
     if isFirst(token_list, [TokenTypes.CLOSEPAR]):
         return [], token_list[1:]
@@ -64,7 +68,8 @@ def getCallParameters(token_list: List[Token]) -> Tuple[List[Union[int, str, flo
     else:
         raise ParseError(f"getCallParameters wanted Token of types: [CLOSEPAR, SEP, ID or NUMBER]", token_list[0] if len(token_list) != 0 else None)
 
-        
+
+@dcDecorator      
 def getParseValue(token_list: List[Token], first: bool=False, operator: Optional[Token]=None, lhs: Optional[ValueNode]=None) -> Tuple[Node, List[Token]]:
     
     if isFirst(token_list, [TokenTypes.ID]):
@@ -116,11 +121,13 @@ def getParseValue(token_list: List[Token], first: bool=False, operator: Optional
         raise ParseError(f"getParseValue", token_list[0] if len(token_list) != 0 else None)
 
 
+@dcDecorator
 def flattenActionList(action_list: List[List[ActionNode]]) -> List[ActionNode]:
     flat_list = reduce(lambda x, y: [x] + y, action_list)
     return flat_list
 
 
+@dcDecorator
 def getActions(token_list: List[Token]) -> Tuple[Optional[Union[None,List[ActionNode]]],List[Token]]:
     """ Function to parse actions inside of a function """
     if isFirst(token_list, [TokenTypes.CLOSEBR]):
@@ -129,7 +136,7 @@ def getActions(token_list: List[Token]) -> Tuple[Optional[Union[None,List[Action
     action_list = []
     if isFirst(token_list, [TokenTypes.ID]):
         if isFirst(token_list[1:], [TokenTypes.ASSIGN]):
-            variable, token_list1 = getParseValue(token_list, True)
+            variable, token_list1 = getParseValue(token_list[2:], True)
             action_list.append(AssignNode(token_list[0], variable))
 
         return_actions, return_tokens = getActions(token_list1)
@@ -168,6 +175,7 @@ def getActions(token_list: List[Token]) -> Tuple[Optional[Union[None,List[Action
         raise ParseError(f"getActions wanted Token of types: [ID, RETURN, IF, WHILE, CLOSEBR]", token_list[0] if len(token_list) != 0 else None)
 
 
+@dcDecorator
 def parser(token_list: List[Token]) -> List[FunctionDefNode]:
     """ This function keeps parsing functions until there are no more tokens or an error occurs """
     _, token_list1 = getToken(token_list, [TokenTypes.DEF])
