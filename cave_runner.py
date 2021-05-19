@@ -62,7 +62,8 @@ def getRunnerValue(action: ValueNode, variable_list: Dict[str, Union[int,str]], 
 
 @dcDecorator
 def runIfOrWhile(node: IfOrWhileNode, variable_list: Dict[str, Union[int,str]], function_list: Dict[str, FunctionDefNode]) -> Dict[str,Union[str,int]]:
-    """ execute an if statement or while loop """
+    """ execute an if statement or while loop 
+        returns an updated variable list """
     if getRunnerValue(node.condition, variable_list, function_list) != 0:
         if len(node.action_list) > 1:
             new_variable_list = reduce(lambda variables, actions: runAction(variables, function_list, actions), node.action_list, variable_list)
@@ -76,7 +77,8 @@ def runIfOrWhile(node: IfOrWhileNode, variable_list: Dict[str, Union[int,str]], 
 
 @dcDecorator
 def runAction(variable_list: Dict[str, Union[int,str]], function_list: Dict[str, FunctionDefNode], action: List[ActionNode], parameters: Optional[Dict[str,Union[str,int]]]=None) -> Dict[str, Union[int,str]]:
-    """ execute and action and return the variable list with updated variables """
+    """ execute and action and return the variable list with updated variables 
+        returns an updated variable list """
     if "return" in variable_list.keys():
         return variable_list
 

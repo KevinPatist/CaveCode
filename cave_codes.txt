@@ -39,6 +39,7 @@ fdooga main hoooga hsooga broooga
 brsooga
 
 
+
 loopige functie
 fdooga sommig hoooga n hsooga broooga
     result isooga 0 booga
@@ -51,4 +52,39 @@ brsooga
 
 fdooga main hoooga hsooga broooga
     retooga sommig hoooga 5 hsooga booga
+brsooga
+
+
+
+fibo broeder
+fdooga fibo hoooga n hsooga broooga
+    ifooga hoooga n leqooga 1 hsooga broooga
+        retooga n booga
+    
+    param1 isooga n mooga 1 booga
+    param2 isooga n mooga 2 booga
+
+    retooga fibo hoooga param1 hsooga plooga fibo hoooga param2 hsooga booga
+brsooga
+
+fdooga main hoooga hsooga broooga
+    retooga fibo hoooga 10 hsooga booga
+brsooga
+
+
+
+fdooga add hoooga a komooga b hsooga broooga
+    retooga a plooga b booga
+brsooga
+
+fdooga main hoooga hsooga broooga
+    a isooga 1 booga
+        
+    ifooga hoooga 3 greqooga 2 hsooga broooga
+        whooga hoooga a lesooga 5 hsooga broooga
+            retooga add hoooga a komooga 2 hsooga booga
+        brsooga
+    brsooga
+    
+    retooga a booga
 brsooga

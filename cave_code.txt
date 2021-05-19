@@ -1,12 +1,17 @@
-fdooga sommig hoooga n hsooga broooga
-    result isooga 0 booga
-    whooga hoooga n greqooga 1 hsooga broooga
-        result isooga result plooga n booga
-        n isooga n mooga 1 booga
+fdooga fibo hoooga n hsooga broooga
+    ifooga hoooga n leeqooga 1 hsooga broooga
+        retooga n booga
     brsooga
-    retooga result booga
+
+    param1 isooga n mooga 1 booga
+    param2 isooga n mooga 2 booga
+
+    fibo1 isooga fibo hoooga param1 hsooga booga
+    fibo2 isooga fibo hoooga param2 hsooga booga
+
+    retooga fibo1 plooga fibo2 booga
 brsooga
 
 fdooga main hoooga hsooga broooga
-    retooga sommig hoooga 5 hsooga booga
+    retooga fibo hoooga 3 hsooga booga
 brsooga
