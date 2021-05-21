@@ -51,6 +51,7 @@ class Token:
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the token's content, type and position """
         return f"(value: \"{self.content}\", type: {self.token_type}, position: {self.position}\n"
 
 
@@ -63,6 +64,7 @@ class Node:
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the empty node's position """
         return f"Empty Base Node, position: {self.position}"
 
 
@@ -75,6 +77,7 @@ class ValueNode(Node):
         return self.__repr__()
     
     def __repr__(self) -> str:
+        """ Returns a string containing the empty value node's position """
         return f"Empty Value Node, position: {self.position}"
 
 
@@ -88,6 +91,7 @@ class VariableNode(ValueNode):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the node's value """
         return f"{self.value}"
 
 
@@ -102,6 +106,7 @@ class FunctionCallNode(ValueNode):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the functionCallNode's function name and parameters """
         return f"function name: {self.function_name}, parameters: {self.parameters}"
 
 
@@ -117,6 +122,7 @@ class OperatorNode(ValueNode):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the empty OperatorNode's lhs, operator type and rhs """
         return f"lhs: {self.lhs.__str__()}, operator: {self.operator}, rhs: {self.rhs.__str__()}"
 
 
@@ -129,6 +135,7 @@ class ActionNode(Node):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the empty node's position """
         return f"Empty Action Node, position: {self.position}"
 
 
@@ -143,6 +150,7 @@ class AssignNode(ActionNode):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the AssignNode's name and value """
         return f"variable name: {self.name}, value: {self.value}"
 
 
@@ -158,6 +166,7 @@ class IfOrWhileNode(ActionNode):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the IfOrWhileNode's condition, actionlist and the is_loop bool """
         return f"condition: {self.condition}, actions: {self.action_list}, loop: {self.is_loop}"
 
 
@@ -171,6 +180,7 @@ class ReturnNode(ActionNode):
         return self.__repr__()
     
     def __repr__(self) -> str:
+        """ Returns a string containing the ReturnNode's return value """
         return f"return value: {self.return_value}"
         
 
@@ -186,4 +196,5 @@ class FunctionDefNode(Node):
         return self.__repr__()
 
     def __repr__(self) -> str:
+        """ Returns a string containing the FunctionDefNode's name, parameterlist and actionlist """
         return f"Function {self.name}, with parameters: {self.parameters} and actions: {self.action_list}"

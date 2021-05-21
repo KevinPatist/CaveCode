@@ -3,18 +3,23 @@ fdooga add hoooga a komooga b hsooga broooga
 brsooga
 
 fdooga main hoooga hsooga broooga
-    ifooga hoooga 1 greqooga 2 hsooga broooga
+    ifooga hoooga 4 greqooga 2 hsooga broooga
+        ifooga hoooga 5 lesooga 5 hsooga broooga
+            retooga add hoooga 2 komooga 2 hsooga booga
+        brsooga
         retooga add hoooga 1 komooga 2 hsooga booga
     brsooga
 
     a isooga 1 booga
 
     whooga hoooga a lesooga 5 hsooga broooga
-        retooga add hoooga a komooga 2 hsooga booga
+        a isooga add hoooga a komooga 2 hsooga booga
     brsooga
 
     retooga a booga
 brsooga
+
+
 
 
 recursieve zooi
@@ -52,23 +57,6 @@ brsooga
 
 fdooga main hoooga hsooga broooga
     retooga sommig hoooga 5 hsooga booga
-brsooga
-
-
-
-fibo broeder
-fdooga fibo hoooga n hsooga broooga
-    ifooga hoooga n leqooga 1 hsooga broooga
-        retooga n booga
-    
-    param1 isooga n mooga 1 booga
-    param2 isooga n mooga 2 booga
-
-    retooga fibo hoooga param1 hsooga plooga fibo hoooga param2 hsooga booga
-brsooga
-
-fdooga main hoooga hsooga broooga
-    retooga fibo hoooga 10 hsooga booga
 brsooga
 
 

@@ -9,6 +9,7 @@ class RunnerError(Exception):
         super().__init__(message)
 
 
+# getOperatorFunction :: TokenTypes -> Callable
 @dcDecorator
 def getOperatorFunction(token_type: TokenTypes) -> Callable:
     """ Return the operator function belonging to the operator type """
@@ -25,6 +26,7 @@ def getOperatorFunction(token_type: TokenTypes) -> Callable:
     return operators[token_type]
 
 
+# getRunnerValue :: ValueNode -> Dict[str,Union[int,str]] -> Dict[str,FunctionDefNode] -> Union[str,int]
 @dcDecorator
 def getRunnerValue(action: ValueNode, variable_list: Dict[str, Union[int,str]], function_list: Dict[str, FunctionDefNode]) -> Union[str,int]:
     """ Returns a value from a valuenode """
@@ -60,6 +62,7 @@ def getRunnerValue(action: ValueNode, variable_list: Dict[str, Union[int,str]], 
     return value
 
 
+# runIfOrWhile :: IfOrWhileNode -> Dict[str,Union[int,str]] -> Dict[str,FunctionDefNode] -> Dict[str,Union[str,int]]
 @dcDecorator
 def runIfOrWhile(node: IfOrWhileNode, variable_list: Dict[str, Union[int,str]], function_list: Dict[str, FunctionDefNode]) -> Dict[str,Union[str,int]]:
     """ execute an if statement or while loop 
@@ -75,6 +78,7 @@ def runIfOrWhile(node: IfOrWhileNode, variable_list: Dict[str, Union[int,str]], 
     return variable_list
 
 
+# runAction :: Dict[str,Union[int,str]] -> Dict[str,FunctionDefNode] -> List[ActionNode] -> Optional[Dict[str,Union[str,int]]] -> Dict[str,Union[int,str]]
 @dcDecorator
 def runAction(variable_list: Dict[str, Union[int,str]], function_list: Dict[str, FunctionDefNode], action: List[ActionNode], parameters: Optional[Dict[str,Union[str,int]]]=None) -> Dict[str, Union[int,str]]:
     """ execute and action and return the variable list with updated variables 
@@ -101,6 +105,7 @@ def runAction(variable_list: Dict[str, Union[int,str]], function_list: Dict[str,
     return new_variable_list
 
 
+# runFunction :: str -> Dict[str,Union[int,str]] -> Dict[str,FunctionDefNode] -> Optional[Dict[str,Union[str,int]]] -> Union[str,int]
 @dcDecorator
 def runFunction(function_name: str, variable_list: Dict[str, Union[int,str]], function_list: Dict[str, FunctionDefNode], parameters: Optional[Dict[str, Union[str,int]]]=None) -> Union[str,int]:
     """ run a function if it exists and return it's result """
@@ -118,11 +123,14 @@ def runFunction(function_name: str, variable_list: Dict[str, Union[int,str]], fu
     raise RunnerError(f"Function \"{function_name}\" does have a return value")
 
 
+# getFunctionName :: FunctionDefNode -> Tuple[str,FunctionDefNode]
 @dcDecorator
 def getFunctionName(function: FunctionDefNode) -> Tuple[str, FunctionDefNode]:
+    """ This function is used to get the name from a functionDefNode """
     return function.name, function
 
 
+# runner :: List[FunctionDefNode] -> None
 @dcDecorator
 def runner(ast: List[FunctionDefNode]) -> None:
     """ Runs the main function from the given AST and prints the result"""

@@ -15,6 +15,7 @@ class ParseError(Exception):
             super().__init__(f"\nExpected {self.wanted}, but got nothing.")
 
 
+# isFirst :: List[Token] -> List[TokenTypes] -> bool
 @dcDecorator
 def isFirst(token_list: List[Token], token_type: List[TokenTypes]) -> bool:
     """ Checks if the first item in token_list has a type in token_type
@@ -24,6 +25,7 @@ def isFirst(token_list: List[Token], token_type: List[TokenTypes]) -> bool:
     raise ParseError(f"\nisFirst wanted tokens of types: [{token_type}]", token_list[0] if len(token_list) != 0 else None)
 
 
+# getToken :: List[Token] -> List[TokenTypes] -> Tuple[Token, List[Token]]
 @dcDecorator
 def getToken(token_list: List[Token], wanted_types: List[TokenTypes]) -> Tuple[Token, List[Token]]:
     """ if the first token in the list is of the wanted TokenType this function returns the first token as well as the remaining list 
@@ -34,6 +36,7 @@ def getToken(token_list: List[Token], wanted_types: List[TokenTypes]) -> Tuple[T
         raise ParseError(f"\ngetToken wanted TokenTypes: {wanted_types}", token_list[0])
 
 
+# getParameters :: List[Token] -> Tuple[Dict[str,int], List[Token]]
 @dcDecorator
 def getParameters(token_list: List[Token]) -> Tuple[Dict[str, int], List[Token]]:
     """ This function is used to get parameters in function definitions
@@ -52,8 +55,11 @@ def getParameters(token_list: List[Token]) -> Tuple[Dict[str, int], List[Token]]
         raise ParseError(f"\ngetParameters wanted Token of types: [ID, SEP or CLOSEPAR]", token_list[0] if len(token_list) != 0 else None)
         
 
+# getCallParameters :: List[Token] -> Tuple[List[Union[int,str,float]], List[Token]]
 @dcDecorator
 def getCallParameters(token_list: List[Token]) -> Tuple[List[Union[int, str, float]], List[Token]]:
+    """ This function is used to get the parameters given with a function call.
+        It returns a list of values (the given parameters) and the remaining list of tokens. """
     if isFirst(token_list, [TokenTypes.CLOSEPAR]):
         return [], token_list[1:]
 
@@ -72,6 +78,7 @@ def getCallParameters(token_list: List[Token]) -> Tuple[List[Union[int, str, flo
         raise ParseError(f"\ngetCallParameters wanted Token of types: [CLOSEPAR, SEP, ID or NUMBER]", token_list[0] if len(token_list) != 0 else None)
 
 
+# getParseValue :: List[Token] -> bool -> Optional[Token] -> Optional[ValueNode] -> Tuple[Node, List[Token]]
 @dcDecorator      
 def getParseValue(token_list: List[Token], first: bool=False, operator: Optional[Token]=None, lhs: Optional[ValueNode]=None) -> Tuple[Node, List[Token]]:
     """ This function is used to get values for variable assignments, if or while conditions and operators
@@ -126,6 +133,7 @@ def getParseValue(token_list: List[Token], first: bool=False, operator: Optional
         raise ParseError(f"\ngetParseValue", token_list[0] if len(token_list) != 0 else None)
 
 
+# flattenActionList :: List[List[ActionNode]] -> List[ActionNode]
 @dcDecorator
 def flattenActionList(action_list: List[List[ActionNode]]) -> List[ActionNode]:
     """ This function returns a flattened list of ActionNode objects for easier use """
@@ -133,6 +141,7 @@ def flattenActionList(action_list: List[List[ActionNode]]) -> List[ActionNode]:
     return flat_list
 
 
+# getActions :: List[Token] -> Tuple[ Optional[ Union[ None, List[ActionNode] ] ], List[Token] ]
 @dcDecorator
 def getActions(token_list: List[Token]) -> Tuple[Optional[Union[None,List[ActionNode]]],List[Token]]:
     """ Function to parse actions found inside of a function """
@@ -181,6 +190,7 @@ def getActions(token_list: List[Token]) -> Tuple[Optional[Union[None,List[Action
         raise ParseError(f"\ngetActions wanted Token of types: [ID, RETURN, IF, WHILE, CLOSEBR]", token_list[0] if len(token_list) != 0 else None)
 
 
+# parser :: List[Token] -> List[FunctionDefNode]
 @dcDecorator
 def parser(token_list: List[Token]) -> List[FunctionDefNode]:
     """ This function keeps parsing functions until there are no more tokens or an error occurs """
