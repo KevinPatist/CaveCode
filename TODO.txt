@@ -1,14 +1,14 @@
 - commenten       V
 - readme maken     
-- turingcompleetheid aantonen:
-    branching met shit erin
-    while loops die infinite kunnen tot max recursion depth of stack overflow
-    zolang hardware het ondersteund infinite variabelen
-    return waarde uit de main
-    input gegeven door in code in te voeren
-- heeft dcDecorator   V
-- haskell zooi boven functies tyfen   V
-- hogere orde functies laten zien
+- turingcompleetheid aantonen:  V
+    branching met shit erin V
+    while loops die infinite kunnen tot max recursion depth of stack overflow V
+    zolang hardware het ondersteund infinite variabelen V
+    return waarde uit de main V
+    input gegeven door in code in te voeren V
+- heeft dcDecorator  VOORBEELD GEVEN
+- haskell zooi boven functies tyfen  V
+- hogere orde functies laten zien  
 - video maken waarin ik de structuur uitleg van mn taal, interpreter en laat zien hoe die gebruikt wordt
 
 functionaliteiten:
