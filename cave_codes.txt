@@ -1,3 +1,5 @@
+eigen test functies:
+
 fdooga add hoooga a komooga b hsooga broooga
     retooga a plooga b booga
 brsooga
@@ -22,7 +24,8 @@ brsooga
 
 
 
-recursieve zooi
+recursieve functies:
+
 fdooga even hoooga n hsooga broooga
     ifooga hoooga n eqooga 0 hsooga broooga
         retooga 0 booga
@@ -45,7 +48,8 @@ brsooga
 
 
 
-loopige functie
+loopige functie:
+
 fdooga sommig hoooga n hsooga broooga
     result isooga 0 booga
     whooga hoooga n greqooga 1 hsooga broooga
@@ -57,22 +61,4 @@ brsooga
 
 fdooga main hoooga hsooga broooga
     retooga sommig hoooga 5 hsooga booga
-brsooga
-
-
-
-fdooga add hoooga a komooga b hsooga broooga
-    retooga a plooga b booga
-brsooga
-
-fdooga main hoooga hsooga broooga
-    a isooga 1 booga
-        
-    ifooga hoooga 3 greqooga 2 hsooga broooga
-        whooga hoooga a lesooga 5 hsooga broooga
-            retooga add hoooga a komooga 2 hsooga booga
-        brsooga
-    brsooga
-    
-    retooga a booga
 brsooga
