@@ -39,4 +39,53 @@ brsooga
     - [ReturnNode](watkanjewel.nl)
 
   - [FunctionDefNode](watkanjewel.nl)
+- **Object-printing voor elke class:** Ja
+- **Decorator:**
+  - [Function definition](watkanjewel.nl)
+  - Toegepast boven elke functie in de lexer, parser en interpreter.
+  - [Voorbeeld](watkanjewel.nl)
+- **Type-annotatie:**
+  - Haskell-stijl in comments: Ja
+  - Python-stijl in functiedefinities: Ja
+- **Hogere orde functies:**
+  - [Reduce](lexer->flattenTokenList)
+  - [Map](lexer->caveLexer)
+  - [Reduce](parser->flattenActionList)
+  - [Reduce](runner->runIfOrWhile)
+  - [Reduce](runner->runFunction)
 
+
+## Interpreter-functionaliteit Must-have:
+- **Functies:** Meer per file
+- **Functie parameters:** Meegegeven aan interpreter door in de main functie als variabelen toe te voegen en deze bij de functie aanroep mee te geven.
+- **Functies kunnen andere functies aanroepen:**
+
+  ```
+  fdooga even hoooga n hsooga broooga
+    ifooga hoooga n eqooga 0 hsooga broooga
+        retooga 0 booga
+    brsooga
+    m isooga n mooga 1 booga
+    retooga odd hoooga m hsooga booga
+  brsooga
+
+  fdooga odd hoooga n hsooga broooga
+    ifooga hoooga n eqooga 0 hsooga broooga
+        retooga 1 booga
+    brsooga
+    m isooga n mooga 1 booga
+    retooga even hoooga m hsooga booga
+  brsooga
+
+  fdooga main hoooga hsooga broooga
+    retooga odd hoooga 21 hsooga booga
+  brsooga
+  ```
+- **Functie resultaat wordt op de volgende manier weergegeven:**
+  - Als return variabele in de variabelen lijst.
+  - Uit de main geprint na het runnen van het programma.
+
+## Interpreter-functionaliteit should/could-have:
+  - **Error-messaging:** geïmplementeerd door middel van de volgende error classes:
+    - [ParseError](parser->ParseError)
+    - [RunnerError](runner->RunnerError)
