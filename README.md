@@ -27,32 +27,32 @@ brsooga
 
 ## Bevat
 - **Classes met inheritance:**
-  De classes die gebruikt worden voor de AST binnen CaveCode stammen allemaal af van een base [Node class](watkanjewel.nl). Uit deze base node erven drie andere classes waaruit weer subclasses erven:
-  - [ValueNode](watkanjewel.nl):
-    - [VariableNode](watkanjewel.nl)
-    - [FunctionCallNode](watkanjewel.nl)
-    - [OperatorNode](watkanjewel.nl)
+  De classes die gebruikt worden voor de AST binnen CaveCode stammen allemaal af van een base [Node class](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L58). Uit deze base node erven drie andere classes waaruit weer subclasses erven:
+  - [ValueNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L71):
+    - [VariableNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L84)
+    - [FunctionCallNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L98)
+    - [OperatorNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L113)
 
-  - [ActionNode](watkanjewel.nl)
-    - [AssignNode](watkanjewel.nl)
-    - [IfOrWhileNode](watkanjewel.nl)
-    - [ReturnNode](watkanjewel.nl)
+  - [ActionNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L129)
+    - [AssignNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L142)
+    - [IfOrWhileNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L157)
+    - [ReturnNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L173)
 
-  - [FunctionDefNode](watkanjewel.nl)
+  - [FunctionDefNode](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L187)
 - **Object-printing voor elke class:** Ja
 - **Decorator:**
-  - [Function definition](watkanjewel.nl)
+  - [Function definition](https://github.com/KevinPatist/CaveCode/blob/main/cave_classes.py#L11)
   - Toegepast boven elke functie in de lexer, parser en interpreter.
-  - [Voorbeeld](watkanjewel.nl)
+  - [Voorbeeld](https://github.com/KevinPatist/CaveCode/blob/main/cave_parser.py#L19)
 - **Type-annotatie:**
   - Haskell-stijl in comments: Ja
   - Python-stijl in functiedefinities: Ja
 - **Hogere orde functies:**
-  - [Reduce](lexer->flattenTokenList)
-  - [Map](lexer->caveLexer)
-  - [Reduce](parser->flattenActionList)
-  - [Reduce](runner->runIfOrWhile)
-  - [Reduce](runner->runFunction)
+  - [Reduce](https://github.com/KevinPatist/CaveCode/blob/main/cave_lexer.py#L97)
+  - [Map](https://github.com/KevinPatist/CaveCode/blob/main/cave_lexer.py#L108)
+  - [Reduce](https://github.com/KevinPatist/CaveCode/blob/main/cave_parser.py#L140)
+  - [Reduce](https://github.com/KevinPatist/CaveCode/blob/main/cave_runner.py#L72)
+  - [Reduce](https://github.com/KevinPatist/CaveCode/blob/main/cave_runner.py#L116)
 
 
 ## Interpreter-functionaliteit Must-have:
@@ -87,5 +87,5 @@ brsooga
 
 ## Interpreter-functionaliteit should/could-have:
   - **Error-messaging:** geïmplementeerd door middel van de volgende error classes:
-    - [ParseError](parser->ParseError)
-    - [RunnerError](runner->RunnerError)
+    - [ParseError](https://github.com/KevinPatist/CaveCode/blob/main/cave_parser.py#L3)
+    - [RunnerError](https://github.com/KevinPatist/CaveCode/blob/main/cave_runner.py#L6)
