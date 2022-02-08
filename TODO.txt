@@ -6,9 +6,9 @@
     zolang hardware het ondersteund infinite variabelen V
     return waarde uit de main V
     input gegeven door in code in te voeren V
-- heeft dcDecorator  VOORBEELD GEVEN
+- heeft dcDecorator  VOORBEELD GEVEN V
 - haskell zooi boven functies tyfen  V
-- hogere orde functies laten zien  
+- hogere orde functies laten zien  V
 - video maken waarin ik de structuur uitleg van mn taal, interpreter en laat zien hoe die gebruikt wordt
 
 functionaliteiten:
