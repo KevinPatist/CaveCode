@@ -1,12 +1,20 @@
-fdooga sommig hoooga n hsooga broooga
-    result isooga 0 booga
-    whooga hoooga n greqooga 1 hsooga broooga
-        result isooga result plooga n booga
-        n isooga n mooga 1 booga
-    brsooga
-    retooga result booga
+fdooga add hoooga a komooga b hsooga broooga
+    retooga a plooga b booga
 brsooga
 
 fdooga main hoooga hsooga broooga
-    retooga sommig hoooga 5 hsooga booga
+    ifooga hoooga 4 greqooga 2 hsooga broooga
+        ifooga hoooga 5 lesooga 5 hsooga broooga
+            retooga add hoooga 2 komooga 2 hsooga booga
+        brsooga
+        retooga add hoooga 1 komooga 2 hsooga booga
+    brsooga
+
+    c isooga 1 booga
+
+    whooga hoooga c lesooga 5 hsooga broooga
+        c isooga add hoooga c komooga 2 hsooga booga
+    brsooga
+
+    retooga c booga
 brsooga
