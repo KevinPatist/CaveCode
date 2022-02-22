@@ -12,13 +12,13 @@ fdooga main hoooga hsooga broooga
         retooga add hoooga 1 komooga 2 hsooga booga
     brsooga
 
-    a isooga 1 booga
+    c isooga 1 booga
 
-    whooga hoooga a lesooga 5 hsooga broooga
-        a isooga add hoooga a komooga 2 hsooga booga
+    whooga hoooga c lesooga 5 hsooga broooga
+        c isooga add hoooga c komooga 2 hsooga booga
     brsooga
 
-    retooga a booga
+    retooga c booga
 brsooga
 
 
@@ -26,20 +26,20 @@ brsooga
 
 recursieve functies:
 
-fdooga even hoooga n hsooga broooga
-    ifooga hoooga n eqooga 0 hsooga broooga
+fdooga even hoooga a hsooga broooga
+    ifooga hoooga a eqooga 0 hsooga broooga
         retooga 0 booga
     brsooga
-    m isooga n mooga 1 booga
-    retooga odd hoooga m hsooga booga
+    b isooga a mooga 1 booga
+    retooga odd hoooga b hsooga booga
 brsooga
 
-fdooga odd hoooga n hsooga broooga
-    ifooga hoooga n eqooga 0 hsooga broooga
+fdooga odd hoooga c hsooga broooga
+    ifooga hoooga c eqooga 0 hsooga broooga
         retooga 1 booga
     brsooga
-    m isooga n mooga 1 booga
-    retooga even hoooga m hsooga booga
+    d isooga c mooga 1 booga
+    retooga even hoooga d hsooga booga
 brsooga
 
 fdooga main hoooga hsooga broooga
@@ -47,14 +47,13 @@ fdooga main hoooga hsooga broooga
 brsooga
 
 
-
 loopige functie:
 
-fdooga sommig hoooga n hsooga broooga
+fdooga sommig hoooga a hsooga broooga
     result isooga 0 booga
-    whooga hoooga n greqooga 1 hsooga broooga
-        result isooga result plooga n booga
-        n isooga n mooga 1 booga
+    whooga hoooga a greqooga 1 hsooga broooga
+        result isooga result plooga a booga
+        a isooga a mooga 1 booga
     brsooga
     retooga result booga
 brsooga

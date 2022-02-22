@@ -90,10 +90,10 @@ def keywordsToToken(keywords_list: Tuple[int,List[Tuple[int,str]]]) -> List[Toke
     return tokens_list
 
 
-# flattenTokenList :: List[List[Token]] -> List[Token]
+# flattenList :: List[List[Token]] -> List[Token]
 @dcDecorator
-def flattenTokenList(token_list: List[List[Token]]) -> List[Token]:
-    """ This function is used to flatten a tokenlist for easier use. """
+def flattenList(token_list: List[List[Token]]) -> List[Token]:
+    """ This function is used to flatten a list for easier use. """
     flat_list = reduce(lambda x, y: x + y, token_list)
     return flat_list
 
@@ -106,5 +106,5 @@ def caveLexer(code_text: List[List[str]], token_types: Type[Enum] = TokenTypes) 
     keywords = []
     keywords = list(enumerate(map(lineToKeywords, code_text), 1))
     token_list = list(map(keywordsToToken, keywords))
-    flat_token_list = flattenTokenList(token_list)
+    flat_token_list = flattenList(token_list)
     return flat_token_list
