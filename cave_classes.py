@@ -198,3 +198,27 @@ class FunctionDefNode(Node):
     def __repr__(self) -> str:
         """ Returns a string containing the FunctionDefNode's name, parameterlist and actionlist """
         return f"Function {self.name}, with parameters: {self.parameters} and actions: {self.action_list}"
+
+class CompVarNode():
+    """ Node used to store variable data for the compiler """
+    def __init__(self, name: str, value: Union[OperatorNode, int]):
+        self.name = name
+        self.value = value
+        self.pointer = None
+        self.assign_label = None
+
+    def __str__(self) -> str:
+        return self.__repr__()
+    
+    def __repr__(self) -> str:
+        """ Returns a string containing the variable's values """
+        return f"Var Name: {self.name}, Var Value: {self.value}, Var Assign Label: {self.assign_label}, Var Stack *: {self.pointer}"
+
+    def setStackPointer(self, pointer: str):
+        """ This function sets the stack pointer value in the Node """
+        self.pointer = pointer
+
+    def setAssignLabel(self, label: str):
+        """ This function sets the assign label in case the variable is an OperatorNode """
+        self.assign_label = label
+        
