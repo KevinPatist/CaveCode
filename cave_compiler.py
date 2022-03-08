@@ -36,7 +36,7 @@ def convertToNode(var_tup: Tuple[str, int]) -> Tuple[str, CompVarNode]:
     return var_tup[0], CompVarNode(var_tup[0], var_tup[1])
 
 @dcDecorator
-def getVariableList(function: FunctionDefNode) -> list[Tuple[str, CompVarNode]]:
+def getVariableList(function: FunctionDefNode) -> List[Tuple[str, CompVarNode]]:
     """ This function returns a list of all variables and parameters for the given function 
         It also returns their initial value """
     if len(function.parameters) > 0:
@@ -99,25 +99,25 @@ def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> s
 @dcDecorator
 def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
     """ This function creates code to intialise a single variable """
-    return_tuple = ("","")
-    return_tuple[0] = "\t"
+    return_list = ["",""]
+    return_list[0] = "\t"
     if isinstance(var_dict[dict_key].value, OperatorNode):
-        return_tuple[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-        return_tuple[0] += "ldr r0, #0\n\t"
-        return_tuple[0] += "str r0, [sp, #0]\n\t"
-        return_tuple[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+        return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+        return_list[0] += "ldr r0, #0\n\t"
+        return_list[0] += "str r0, [sp, #0]\n\t"
+        return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
 
-        return_tuple[1] += var_dict[dict_key].name + ":\n\t"
+        return_list[1] += var_dict[dict_key].name + ":\n\t"
         var_dict[dict_key].setAssignLabel(var_dict[dict_key].name)
-        return_tuple[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
-        return_tuple[1] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-        return_tuple[1] += "str r0, [sp, #0]\n\t"
-        return_tuple[1] += "add sp, sp, " + var_dict[dict_key].pointer + "\n\n"
+        return_list[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
+        return_list[1] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+        return_list[1] += "str r0, [sp, #0]\n\t"
+        return_list[1] += "add sp, sp, " + var_dict[dict_key].pointer + "\n\n"
     else:
-        return_tuple[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-        return_tuple[0] += "ldr r0, #" + str(var_dict[dict_key].value) + "\n\t"
-        return_tuple[0] += "str r0, [sp, #0]\n\t"
-        return_tuple[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+        return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+        return_list[0] += "ldr r0, #" + str(var_dict[dict_key].value) + "\n\t"
+        return_list[0] += "str r0, [sp, #0]\n\t"
+        return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
     # ToDo:
     # steps:
     # Assign labels for operator variables
@@ -126,7 +126,7 @@ def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,s
     # placing them on the stack according to their pointer values
     # returning stack pointer to original value
     # return_string += "\n"
-    return return_tuple
+    return return_list
 
 # @dcDecorator
 # def fineTuneInitCode(code_list: List[str]) -> str:
@@ -139,11 +139,11 @@ def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,s
 #     operator_code_labels = ()
     
 @dcDecorator
-def sortVarInit(var_list: List[Union[str, Tuple[str,str]]]) -> str:
-    var_init_list = [x for x in var_list if isinstance(x, str)]
-    var_init_tuple_list = [x[1] for x in var_list if isinstance(x, Tuple)]
+def sortVarInit(var_list: List[Union[str, List[str]]]) -> str:
+    var_init_list = [x for x in var_list if not isinstance(x, List)]
+    var_init_list_list = [x[1] for x in var_list if isinstance(x, List)]
     print(var_init_list)
-    print(var_init_tuple_list)
+    print(var_init_list_list)
 
 @dcDecorator
 def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
@@ -159,7 +159,7 @@ def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
     return var_init_code
 
 @dcDecorator
-def caveCompiler(ast: list[FunctionDefNode]) -> str:
+def caveCompiler(ast: List[FunctionDefNode]) -> str:
     function_list = dict(map(getFunctionName, ast))
     variable_dict = prepVariableForComp(function_list)
     var_init_code = initialiseVariables(variable_dict)
