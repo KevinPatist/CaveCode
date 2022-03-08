@@ -1,18 +1,7 @@
-from argparse import Action
-from ctypes import pointer
-from venv import create
 from cave_runner import *
 
 '''
 Stappen:
-Aantal variabelen tellen (inclusief parameters)
-
-variabelen tellen:
-parameters tellen en daarna in action list naar AssignNodes zoeken
-
-variabelen assignen aan een stack pointer waarde (met intervals van 4, dus #0, #4, #8 enzo)
-(^^ dit moet in een dict)
-
 functies neerzetten in dezelfde volgorde als in de code
 
 als variabele nodig voor functie: een load_variable gooien
@@ -32,6 +21,9 @@ om de variabele op te slaan op de plek waar die vandaan komt:
 - variable name
 - variable to stack pointer dict
 '''
+
+    
+
 @dcDecorator
 def getNewVars(action: ActionNode) -> Optional[Tuple[str, int]]:
     if isinstance(action, AssignNode):
@@ -64,7 +56,7 @@ def getVariableList(function: FunctionDefNode) -> list[Tuple[str, CompVarNode]]:
 @dcDecorator
 def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: int) -> Dict[str, CompVarNode]:
     """ This fucntion updates a Dict to link variables to their reserved stack location. """
-    pointer_int = rec_depth * 4
+    pointer_int = (rec_depth + 1) * 4
     pointer_str = '#' + str(pointer_int)
     return_dict = dict()
     if len(var_list) == 1:
@@ -79,29 +71,92 @@ def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: in
 
 @dcDecorator
 def prepVariableForComp(function_list: List[FunctionDefNode]) -> Tuple[Dict[str, Union[OperatorNode, int]], Dict[str, str]]:
-    """ This function returns two dicts:
-        - var_dict: which contains teh variable name and it's value 
-        - var_par_to_stack: which contains the variable name and it's assigned stack location 
+    """ This function returns a dict:
+        - var_dict: which contains the variable name and it's value as a CompVarNode 
     """
     variable_list = list(map(getVariableList, function_list.values()))
     flat_var_list = flattenList(variable_list)
-    # vars_stack_size = 4 * len(flat_var_list)
     var_dict = addStackPointerToDict(flat_var_list, 0)
+    print(var_dict)
     return (var_dict)
 
 @dcDecorator
-def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> str:
-    """ This function creates code to intialise a single variable """
-    
+def loadVar(var_name: str, var_dict: Dict[str, CompVarNode]) -> str:
+    return_string = ""
+    if isinstance(var_dict[var_name].value, OperatorNode):
+        return_string += ""
 
+
+@dcDecorator
+def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> str:
+    return_string = ""
+    if isinstance(node.lhs, str):
+        return_string += loadVar(node.lhs, var_dict)
+
+    return return_string
+
+
+@dcDecorator
+def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
+    """ This function creates code to intialise a single variable """
+    return_tuple = ("","")
+    return_tuple[0] = "\t"
+    if isinstance(var_dict[dict_key].value, OperatorNode):
+        return_tuple[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+        return_tuple[0] += "ldr r0, #0\n\t"
+        return_tuple[0] += "str r0, [sp, #0]\n\t"
+        return_tuple[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+
+        return_tuple[1] += var_dict[dict_key].name + ":\n\t"
+        var_dict[dict_key].setAssignLabel(var_dict[dict_key].name)
+        return_tuple[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
+        return_tuple[1] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+        return_tuple[1] += "str r0, [sp, #0]\n\t"
+        return_tuple[1] += "add sp, sp, " + var_dict[dict_key].pointer + "\n\n"
+    else:
+        return_tuple[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+        return_tuple[0] += "ldr r0, #" + str(var_dict[dict_key].value) + "\n\t"
+        return_tuple[0] += "str r0, [sp, #0]\n\t"
+        return_tuple[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+    # ToDo:
+    # steps:
+    # Assign labels for operator variables
+    # code for said variables
+    # Initialisation of the other variables:
+    # placing them on the stack according to their pointer values
+    # returning stack pointer to original value
+    # return_string += "\n"
+    return return_tuple
+
+# @dcDecorator
+# def fineTuneInitCode(code_list: List[str]) -> str:
+#     """
+#     This function takes a list of var_init code and sorts it so that the following applies:
+#     - First each variable is assigned their value or 0 if the value is an operator node
+#     - the variables with operator node values get their own label to calculate its value
+#     - these calculating labels are put besides eachother so the code remains somewhat readable
+#     """
+#     operator_code_labels = ()
+    
+@dcDecorator
+def sortVarInit(var_list: List[Union[str, Tuple[str,str]]]) -> str:
+    var_init_list = [x for x in var_list if isinstance(x, str)]
+    var_init_tuple_list = [x[1] for x in var_list if isinstance(x, Tuple)]
+    print(var_init_list)
+    print(var_init_tuple_list)
 
 @dcDecorator
 def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
     """ This function creates Assembly code to initialise variables """
-    var_init_code = ""
+    stack_reserved = "#" + str(len(var_dict)*4)
+    var_init_code = "var_init:\n\tadd sp, sp, " + stack_reserved + "\n"
     var_init_code_list = list(map(lambda var: initVarToASM(var_dict, var), var_dict.keys()))
+    sorted_var_init_code = sortVarInit(var_init_code_list)
+    # var_init_code_2 = [x.split("|") for x in var_init_code_list]
+    # var_init_code_3 = reduce(lambda x, y: x + y, var_init_code_2)
+    # var_init_code_4 = reduce(lambda x, y: x + y, var_init_code_3)
+    # var_init_code += var_init_code_4
     return var_init_code
-    
 
 @dcDecorator
 def caveCompiler(ast: list[FunctionDefNode]) -> str:

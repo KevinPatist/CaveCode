@@ -212,7 +212,7 @@ class CompVarNode():
     
     def __repr__(self) -> str:
         """ Returns a string containing the variable's values """
-        return f"Var Name: {self.name}, Var Value: {self.value}, Var Assign Label: {self.assign_label}, Var Stack *: {self.pointer}"
+        return f"Var Name: {self.name}, Var Value: {self.value}, Var Assign Label: {self.assign_label}, Var Stack Offset: {self.pointer}"
 
     def setStackPointer(self, pointer: str):
         """ This function sets the stack pointer value in the Node """
