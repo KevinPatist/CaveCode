@@ -32,3 +32,4 @@ REGELS:
 - reken regels gaan van rechts naar links
 - geen variabelen aanmaken in loops of if statements
 - geen variabelen aanpassen buiten loops of if statements
+- kan niet delen als gecompiled

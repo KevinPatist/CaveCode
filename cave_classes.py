@@ -92,7 +92,7 @@ class VariableNode(ValueNode):
 
     def __repr__(self) -> str:
         """ Returns a string containing the node's value """
-        return f"{self.value}"
+        return f"VariableNode value: {self.value}"
 
 
 class FunctionCallNode(ValueNode):
