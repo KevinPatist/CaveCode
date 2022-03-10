@@ -99,7 +99,7 @@ def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> s
 @dcDecorator
 def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
     """ This function creates code to intialise a single variable """
-    return_list = ["",""]
+    return_list = [""]
     return_list[0] = "\t"
     if isinstance(var_dict[dict_key].value, OperatorNode):
         return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
@@ -107,7 +107,7 @@ def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,s
         return_list[0] += "str r0, [sp, #0]\n\t"
         return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
 
-        return_list[1] += var_dict[dict_key].name + ":\n\t"
+        return_list.append(var_dict[dict_key].name + ":\n\t")
         var_dict[dict_key].setAssignLabel(var_dict[dict_key].name)
         return_list[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
         return_list[1] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
@@ -127,23 +127,21 @@ def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,s
     # returning stack pointer to original value
     # return_string += "\n"
     return return_list
-
-# @dcDecorator
-# def fineTuneInitCode(code_list: List[str]) -> str:
-#     """
-#     This function takes a list of var_init code and sorts it so that the following applies:
-#     - First each variable is assigned their value or 0 if the value is an operator node
-#     - the variables with operator node values get their own label to calculate its value
-#     - these calculating labels are put besides eachother so the code remains somewhat readable
-#     """
-#     operator_code_labels = ()
     
 @dcDecorator
 def sortVarInit(var_list: List[Union[str, List[str]]]) -> str:
-    var_init_list = [x for x in var_list if not isinstance(x, List)]
-    var_init_list_list = [x[1] for x in var_list if isinstance(x, List)]
-    print(var_init_list)
-    print(var_init_list_list)
+    """
+    This function takes the raw Variable initialisation code and processes it:
+    The code is first sorted so the stack is filled accordingly.
+    then the assign labels for operator variables is placed.
+    The function puts the whole code segment ito combined_code and returns it.
+    """
+    var_init_list = [x[0] for x in var_list]
+    var_init_list_list = [x[1] for x in var_list if len(x) > 1]
+    combined_code = str(reduce(lambda x, y: x + y, var_init_list))
+    combined_code += "\n"
+    combined_code += str(reduce(lambda x, y: x + y, var_init_list_list))
+    return combined_code
 
 @dcDecorator
 def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
@@ -152,10 +150,7 @@ def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
     var_init_code = "var_init:\n\tadd sp, sp, " + stack_reserved + "\n"
     var_init_code_list = list(map(lambda var: initVarToASM(var_dict, var), var_dict.keys()))
     sorted_var_init_code = sortVarInit(var_init_code_list)
-    # var_init_code_2 = [x.split("|") for x in var_init_code_list]
-    # var_init_code_3 = reduce(lambda x, y: x + y, var_init_code_2)
-    # var_init_code_4 = reduce(lambda x, y: x + y, var_init_code_3)
-    # var_init_code += var_init_code_4
+    var_init_code += sorted_var_init_code
     return var_init_code
 
 @dcDecorator
