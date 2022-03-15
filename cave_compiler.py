@@ -119,37 +119,37 @@ def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> s
     else:
         return_string += "ldr R2, =" + str(node.rhs.value) + "\n\t"
     
-    match node.operator:
-        case TokenTypes.ADD:
-            return_string += "add R0, R1, R2"
-        case TokenTypes.SUB:
-            return_string += "sub R0, R1, R2"
-        case TokenTypes.MUL:
-            return_string += "mul R0, R1, R2"
-        case TokenTypes.EQUALS:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "mov lr, pc\n\t"
-            return_string += "beq true\n\t"
-        case TokenTypes.GREQ:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "mov lr, pc\n\t"
-            return_string += "bge true\n\t"
-        case TokenTypes.LEEQ:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "mov lr, pc\n\t"
-            return_string += "ble true\n\t"
-        case TokenTypes.LESSER:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "mov lr, pc\n\t"
-            return_string += "blt true\n\t"
-        case TokenTypes.GREATER:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "mov lr, pc\n\t"
-            return_string += "bgt true\n\t"
-        case TokenTypes.NOTEQUAL:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "mov lr, pc\n\t"
-            return_string += "bne true\n\t"
+    # match node.operator:
+    #     case TokenTypes.ADD:
+    #         return_string += "add R0, R1, R2"
+    #     case TokenTypes.SUB:
+    #         return_string += "sub R0, R1, R2"
+    #     case TokenTypes.MUL:
+    #         return_string += "mul R0, R1, R2"
+    #     case TokenTypes.EQUALS:
+    #         return_string += "cmp R1, R2\n\t"
+    #         return_string += "mov lr, pc\n\t"
+    #         return_string += "beq true\n\t"
+    #     case TokenTypes.GREQ:
+    #         return_string += "cmp R1, R2\n\t"
+    #         return_string += "mov lr, pc\n\t"
+    #         return_string += "bge true\n\t"
+    #     case TokenTypes.LEEQ:
+    #         return_string += "cmp R1, R2\n\t"
+    #         return_string += "mov lr, pc\n\t"
+    #         return_string += "ble true\n\t"
+    #     case TokenTypes.LESSER:
+    #         return_string += "cmp R1, R2\n\t"
+    #         return_string += "mov lr, pc\n\t"
+    #         return_string += "blt true\n\t"
+    #     case TokenTypes.GREATER:
+    #         return_string += "cmp R1, R2\n\t"
+    #         return_string += "mov lr, pc\n\t"
+    #         return_string += "bgt true\n\t"
+    #     case TokenTypes.NOTEQUAL:
+    #         return_string += "cmp R1, R2\n\t"
+    #         return_string += "mov lr, pc\n\t"
+    #         return_string += "bne true\n\t"
 
 
     return return_string
