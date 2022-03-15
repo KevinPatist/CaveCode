@@ -92,38 +92,34 @@ def loadVar(var_name: str, load_pos: str, var_dict: Dict[str, CompVarNode], stac
     This function loads a variable from the stack into the given register load_pos
     """
     return_string = ""
-    if stack_offset is not None:
-        return_string += "sub sp, sp, #" + str(stack_offset * 4) + "\n\t"
     return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return_string += "ldr " + load_pos + ", [sp, #0]\n\t"
     return_string += "add sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
 @dcDecorator
-def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode], stack_offset: Optional[int]) -> str:
+def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) -> str:
     """
     This function stores a variable from store_pos to it's assiged stack position
     """
     return_string = ""
-    if stack_offset is not None:
-        return_string += "sub sp, sp, #" + str(stack_offset * 4) + "\n\t"
     return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return_string += "str " + store_pos + ", [sp, #0]\n\t"
     return_string += "add sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
 @dcDecorator
-def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode], stack_offset: Optional[int]) -> str:
+def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> str:
     """
     This function translates an OperatorNode into Assembly code
     """
     return_string = ""
     if isinstance(node.lhs.value, str):
-        return_string += loadVar(node.lhs.value, "R1", var_dict, stack_offset)
+        return_string += loadVar(node.lhs.value, "R1", var_dict)
     else:
         return_string += "ldr R1, =" + str(node.lhs.value) + "\n\t"
     if isinstance(node.rhs.value, str):
-        return_string += loadVar(node.rhs.value, "R2", var_dict, stack_offset)
+        return_string += loadVar(node.rhs.value, "R2", var_dict)
     else:
         return_string += "ldr R2, =" + str(node.rhs.value) + "\n\t"
     
