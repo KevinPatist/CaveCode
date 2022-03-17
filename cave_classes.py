@@ -199,6 +199,7 @@ class FunctionDefNode(Node):
         """ Returns a string containing the FunctionDefNode's name, parameterlist and actionlist """
         return f"Function {self.name}, with parameters: {self.parameters} and actions: {self.action_list}"
 
+
 class CompVarNode():
     """ Node used to store variable data for the compiler """
     def __init__(self, name: str, value: Union[OperatorNode, int]):
@@ -221,4 +222,21 @@ class CompVarNode():
     def setAssignLabel(self, label: str):
         """ This function sets the assign label in case the variable is an OperatorNode """
         self.assign_label = label
-        
+
+
+class CompFuncNode():
+    """ Alternative to FunctionDefNode used for the compiler """
+    def __init__(self, function: FunctionDefNode, var_dict: Dict[str, CompVarNode], stack_offset: str):
+        self.name = function.name
+        self.parameters = function.parameters
+        self.action_list = function.action_list
+        self.total_var_dict = var_dict
+        self.stack_offset = stack_offset
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __repr__(self) -> str:
+        """ Returns a string containing the variable's values """
+        return f"Function Name: {self.name}\nFunction Parameters: {self.parameters}\nAction list: {self.action_list}\nTotal_var_list: {self.total_var_dict}\nFunction Stack Size: {self.stack_offset}\n"
+    

@@ -1,4 +1,5 @@
 from inspect import stack
+from types import NoneType
 from unittest import case
 from cave_runner import *
 
@@ -7,6 +8,11 @@ Stappen:
 functies neerzetten in dezelfde volgorde als in de code
 
 als variabele nodig voor functie: een load_variable gooien
+
+NIEUW:
+Functie zooi aanpassen:
+functies moeten aanhouden welke variabelen ze hebben
+en welke stack zooi ze daarbinnen hebben
 
 load_variable:
 vraagt: 
@@ -61,8 +67,10 @@ def getVariableList(function: FunctionDefNode) -> List[Tuple[str, CompVarNode]]:
     return converted_var_list
 
 @dcDecorator
-def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: int) -> Dict[str, CompVarNode]:
+def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: int) -> Optional[Dict[str, CompVarNode]]:
     """ This fucntion updates a Dict to link variables to their reserved stack location. """
+    if len(var_list) == 0:
+        return None
     pointer_int = (rec_depth + 1) * 4
     pointer_str = '#' + str(pointer_int)
     return_dict = dict()
@@ -169,64 +177,114 @@ def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> s
 
     return return_string
 
-
 @dcDecorator
-def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
-    """ This function creates code to intialise a single variable """
-    return_list = [""]
-    return_list[0] = "\t"
-    if isinstance(var_dict[dict_key].value, OperatorNode):
-        return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-        return_list[0] += "ldr r0, #0\n\t"
-        return_list[0] += "str r0, [sp, #0]\n\t"
-        return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
-
-        return_list.append(var_dict[dict_key].name + ":\n\t")
-        var_dict[dict_key].setAssignLabel(var_dict[dict_key].name)
-        return_list[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
-        return_list[1] += storeVar(dict_key, "R0", var_dict)
-        return_list[1] += "\n"
-
+def prepFunctionForComp(function: FunctionDefNode) -> Tuple[str, CompFuncNode]:
+    """
+    This function turns a FunctionDefNode into Tuple[str, CompFuncNode]
+    The CompFuncNode is an alternate FunctionDefNode specialised for use within the compiler
+    It's placed in a tuple so it can easily be turned into a dictionary
+    """
+    # Lijst van alle vars: parameters + vars
+    # Stack offset berekenen
+    # alle vars plek geven zoals in addStackPointerToDict
+    # var_dict naar de nieuwe func node gooien samen met stack offset
+    func_var_list = getVariableList(function)
+    var_dict = addStackPointerToDict(func_var_list, 0)
+    if isinstance(var_dict, NoneType):
+        stack_reserved = "#0"
     else:
-        return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-        return_list[0] += "ldr r0, #" + str(var_dict[dict_key].value) + "\n\t"
-        return_list[0] += "str r0, [sp, #0]\n\t"
-        return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+        stack_reserved = "#" + str(len(var_dict) * 4)
+    return (function.name, CompFuncNode(function, var_dict, stack_reserved))
 
+@dcDecorator
+def storeParams(function: CompFuncNode, rec_depth: int) -> List[str]:
+    return_list = []
+    if len(function.parameters) == 1:
+        reg_str = "R" + str(rec_depth)
+        return_list.append(storeVar(function.parameters.keys()[0], reg_str, function.total_var_dict))
+    else:
+        param_to_store = function.parameters.pop()
+        reg_str = "R" + str(rec_depth)
+        return_list[0] = storeVar(param_to_store.keys(), reg_str, function.total_var_dict)
+        return_list.append(storeParams(function, rec_depth + 1))
     return return_list
+        
     
-@dcDecorator
-def sortVarInit(var_list: List[Union[str, List[str]]]) -> str:
-    """
-    This function takes the raw Variable initialisation code and processes it:
-    The code is first sorted so the stack is filled accordingly.
-    then the assign labels for operator variables is placed.
-    The function puts the whole code segment ito combined_code and returns it.
-    """
-    var_init_list = [x[0] for x in var_list]
-    var_init_list_list = [x[1] for x in var_list if len(x) > 1]
-    combined_code = str(reduce(lambda x, y: x + y, var_init_list))
-    combined_code += "\n"
-    combined_code += str(reduce(lambda x, y: x + y, var_init_list_list))
-    return combined_code
 
 @dcDecorator
-def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
-    """ This function creates Assembly code to initialise variables """
-    stack_reserved = "#" + str(len(var_dict)*4)
-    var_init_code = "var_init:\n\tadd sp, sp, " + stack_reserved + "\n"
-    var_init_code_list = list(map(lambda var: initVarToASM(var_dict, var), var_dict.keys()))
-    sorted_var_init_code = sortVarInit(var_init_code_list)
-    var_init_code += sorted_var_init_code
-    return var_init_code
+def funcToAsm(function: CompFuncNode) -> str:
+    # set label
+    # set stack offset so stack has reserved space
+    # load parameter into it's spot
+    # start the code
+    return_string = function.name + ":\n\t"
+    return_string += "add sp, sp, " + function.stack_offset + "\n\t"
+    store_param_code_list = storeParams(function, 0)
+
+
+    
+
+@dcDecorator
+def generateFullFunctionsCode(func_dict: Dict[str, CompFuncNode]) -> str:
+    # call funcToAsm for all nodes in dict
+    functions_code_list = list(map(funcToAsm, func_dict.values()))
+
+# @dcDecorator
+# def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
+#     """ This function creates code to intialise a single variable """
+#     return_list = [""]
+#     return_list[0] = "\t"
+#     if isinstance(var_dict[dict_key].value, OperatorNode):
+#         return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+#         return_list[0] += "ldr r0, #0\n\t"
+#         return_list[0] += "str r0, [sp, #0]\n\t"
+#         return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+
+#         return_list.append(var_dict[dict_key].name + ":\n\t")
+#         var_dict[dict_key].setAssignLabel(var_dict[dict_key].name)
+#         return_list[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
+#         return_list[1] += storeVar(dict_key, "R0", var_dict)
+#         return_list[1] += "\n"
+
+#     else:
+#         return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
+#         return_list[0] += "ldr r0, #" + str(var_dict[dict_key].value) + "\n\t"
+#         return_list[0] += "str r0, [sp, #0]\n\t"
+#         return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
+
+#     return return_list
+    
+# @dcDecorator
+# def sortVarInit(var_list: List[Union[str, List[str]]]) -> str:
+#     """
+#     This function takes the raw Variable initialisation code and processes it:
+#     The code is first sorted so the stack is filled accordingly.
+#     then the assign labels for operator variables is placed.
+#     The function puts the whole code segment ito combined_code and returns it.
+#     """
+#     var_init_list = [x[0] for x in var_list]
+#     var_init_list_list = [x[1] for x in var_list if len(x) > 1]
+#     combined_code = str(reduce(lambda x, y: x + y, var_init_list))
+#     combined_code += "\n"
+#     combined_code += str(reduce(lambda x, y: x + y, var_init_list_list))
+#     return combined_code
+
+# @dcDecorator
+# def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
+#     """ This function creates Assembly code to initialise variables """
+#     stack_reserved = "#" + str(len(var_dict)*4)
+#     var_init_code = "var_init:\n\tadd sp, sp, " + stack_reserved + "\n"
+#     # var_init_code_list = list(map(lambda var: initVarToASM(var_dict, var), var_dict.keys()))
+#     # sorted_var_init_code = sortVarInit(var_init_code_list)
+#     var_init_code += sorted_var_init_code
+#     return var_init_code
 
 @dcDecorator
 def caveCompiler(ast: List[FunctionDefNode]) -> str:
-    function_list = dict(map(getFunctionName, ast))
-    variable_dict = prepVariableForComp(function_list)
+    func_dict_2 = dict(map(prepFunctionForComp, ast))
     main_init_code = generateMainInit()
-    var_init_code = initialiseVariables(variable_dict)
-    final_code = main_init_code + var_init_code
+    function_code = generateFullFunctionsCode(func_dict_2)
+    final_code = main_init_code + function_code
     print(final_code)
 
 
