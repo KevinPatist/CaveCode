@@ -1,3 +1,4 @@
+from argparse import Action
 from inspect import stack
 from types import NoneType
 from unittest import case
@@ -117,7 +118,7 @@ def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) ->
     return return_string
 
 @dcDecorator
-def operatorNodeToASM(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> str:
+def operatorNodeToAsm(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> str:
     """
     This function translates an OperatorNode into Assembly code
     """
@@ -197,19 +198,32 @@ def prepFunctionForComp(function: FunctionDefNode) -> Tuple[str, CompFuncNode]:
     return (function.name, CompFuncNode(function, var_dict, stack_reserved))
 
 @dcDecorator
-def storeParams(function: CompFuncNode, rec_depth: int) -> List[str]:
+def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: int) -> Optional[List[str]]:
     return_list = []
-    if len(function.parameters) == 1:
+    if len(parameter_list) == 0:
+        return None
+    if len(parameter_list) == 1:
         reg_str = "R" + str(rec_depth)
-        return_list.append(storeVar(function.parameters.keys()[0], reg_str, function.total_var_dict))
+        return_list.append(storeVar(parameter_list[0], reg_str, function.total_var_dict))
+        return return_list
     else:
-        param_to_store = function.parameters.pop()
+        param_to_store = parameter_list.pop()
         reg_str = "R" + str(rec_depth)
-        return_list[0] = storeVar(param_to_store.keys(), reg_str, function.total_var_dict)
-        return_list.append(storeParams(function, rec_depth + 1))
-    return return_list
+        return_list.append(storeVar(param_to_store, reg_str, function.total_var_dict))
+        return_list.append(storeParams(function, parameter_list, rec_depth + 1))
+        flat_list = list(reduce(lambda x, y: [x] + y, return_list))
+        return flat_list
         
-    
+@dcDecorator
+def actionToAsm(action: ActionNode, function: CompFuncNode) -> str:
+    return_string = ""
+    match action:
+        case isinstance(action, AssignNode):
+            return_string += assignNodeToAsm(action, function)
+        case isinstance(action, IfOrWhileNode):
+            return_string += ifOrWhileNodeToAsm(action, function)
+        case isinstance(action, ReturnNode):
+            return_string += returnNodeToAsm(action, function)
 
 @dcDecorator
 def funcToAsm(function: CompFuncNode) -> str:
@@ -217,9 +231,24 @@ def funcToAsm(function: CompFuncNode) -> str:
     # set stack offset so stack has reserved space
     # load parameter into it's spot
     # start the code
+
+    # Setting function label
     return_string = function.name + ":\n\t"
     return_string += "add sp, sp, " + function.stack_offset + "\n\t"
-    store_param_code_list = storeParams(function, 0)
+
+    # Storing Parameters/variables
+    if not isinstance(function.total_var_dict, NoneType):
+        func_param_list = [x for x in function.total_var_dict.keys()]
+    else:
+        func_param_list = []
+    store_param_code_list = storeParams(function, func_param_list, 0)
+    return_string += str(reduce(lambda x, y: x + y, store_param_code_list))
+
+    # Creating function code
+    function_code_list = list(map(lambda x: actionToAsm(x, function), function.action_list))
+    print(function_code_list)
+    return return_string
+
 
 
     
@@ -228,6 +257,7 @@ def funcToAsm(function: CompFuncNode) -> str:
 def generateFullFunctionsCode(func_dict: Dict[str, CompFuncNode]) -> str:
     # call funcToAsm for all nodes in dict
     functions_code_list = list(map(funcToAsm, func_dict.values()))
+    print(functions_code_list)
 
 # @dcDecorator
 # def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
