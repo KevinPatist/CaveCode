@@ -135,7 +135,6 @@ def getFunctionName(function: FunctionDefNode) -> Tuple[str, FunctionDefNode]:
 def runner(ast: List[FunctionDefNode]) -> None:
     """ Runs the main function from the given AST and prints the result"""
     function_list = dict(map(getFunctionName, ast))
-    print(function_list)
     result = runFunction("main", {}, function_list)
     print(f"Finished running code.\n Result: {result}")
     return None

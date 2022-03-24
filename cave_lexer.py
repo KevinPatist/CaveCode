@@ -4,55 +4,56 @@ from cave_classes import *
 @dcDecorator
 def toToken(keyword_tup: Tuple[int,str], linenr: int) -> Token:
     """ This function creates a token from a keyword, its position on the line and its line number. """
-    if keyword_tup[1] == "plooga":
-        return Token(TokenTypes.ADD, "plooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "mooga":
-        return Token(TokenTypes.SUB, "mooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "kooga":
-        return Token(TokenTypes.MUL, "kooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "dooga":
-        return Token(TokenTypes.DIV, "dooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "isooga":
-        return Token(TokenTypes.ASSIGN, "isooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "ifooga":
-        return Token(TokenTypes.IF, "ifooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "elooga":
-        return Token(TokenTypes.ELSE, "elooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "whooga":
-        return Token(TokenTypes.WHILE, "whooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "eqooga":
-        return Token(TokenTypes.EQUALS, "eqooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "greqooga":
-        return Token(TokenTypes.GREQ, "greqooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "leeqooga":
-        return Token(TokenTypes.LEEQ, "leeqooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "lesooga":
-        return Token(TokenTypes.LESSER, "lesooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "grooga":
-        return Token(TokenTypes.GREATER, "grooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "neqooga":
-        return Token(TokenTypes.NOTEQUAL, "neqooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "booga":
-        return Token(TokenTypes.END, "booga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "komooga":
-        return Token(TokenTypes.SEP, "komooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "hoooga":
-        return Token(TokenTypes.OPENPAR, "hoooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "hsooga":
-        return Token(TokenTypes.CLOSEPAR, "hsooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "broooga":
-        return Token(TokenTypes.OPENBR, "broooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "brsooga":
-        return Token(TokenTypes.CLOSEBR, "brsooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "fdooga":
-        return Token(TokenTypes.DEF, "fdooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1] == "retooga":
-        return Token(TokenTypes.RETURN, "retooga", (linenr, keyword_tup[0]))
-    elif keyword_tup[1].isdigit():
-        return Token(TokenTypes.NUMBER, keyword_tup[1], (linenr, keyword_tup[0]))
-    elif re.fullmatch("[a-zA-Z]\w*", keyword_tup[1]):
-        return Token(TokenTypes.ID, keyword_tup[1], (linenr, keyword_tup[0]))
-    
+    match_input = keyword_tup[1]
+    match match_input:
+        case "plooga":
+            return Token(TokenTypes.ADD, "plooga", (linenr, keyword_tup[0]))
+        case "mooga":
+            return Token(TokenTypes.SUB, "mooga", (linenr, keyword_tup[0]))
+        case "kooga":
+            return Token(TokenTypes.MUL, "kooga", (linenr, keyword_tup[0]))
+        case "dooga":
+            return Token(TokenTypes.DIV, "dooga", (linenr, keyword_tup[0]))
+        case "isooga":
+            return Token(TokenTypes.ASSIGN, "isooga", (linenr, keyword_tup[0]))
+        case "ifooga":
+            return Token(TokenTypes.IF, "ifooga", (linenr, keyword_tup[0]))
+        case "elooga":
+            return Token(TokenTypes.ELSE, "elooga", (linenr, keyword_tup[0]))
+        case "whooga":
+            return Token(TokenTypes.WHILE, "whooga", (linenr, keyword_tup[0]))
+        case "eqooga":
+            return Token(TokenTypes.EQUALS, "eqooga", (linenr, keyword_tup[0]))
+        case "greqooga":
+            return Token(TokenTypes.GREQ, "greqooga", (linenr, keyword_tup[0]))
+        case "leeqooga":
+            return Token(TokenTypes.LEEQ, "leeqooga", (linenr, keyword_tup[0]))
+        case "lesooga":
+            return Token(TokenTypes.LESSER, "lesooga", (linenr, keyword_tup[0]))
+        case "grooga":
+            return Token(TokenTypes.GREATER, "grooga", (linenr, keyword_tup[0]))
+        case "neqooga":
+            return Token(TokenTypes.NOTEQUAL, "neqooga", (linenr, keyword_tup[0]))
+        case "booga":
+            return Token(TokenTypes.END, "booga", (linenr, keyword_tup[0]))
+        case "komooga":
+            return Token(TokenTypes.SEP, "komooga", (linenr, keyword_tup[0]))
+        case "hoooga":
+            return Token(TokenTypes.OPENPAR, "hoooga", (linenr, keyword_tup[0]))
+        case "hsooga":
+            return Token(TokenTypes.CLOSEPAR, "hsooga", (linenr, keyword_tup[0]))
+        case "broooga":
+            return Token(TokenTypes.OPENBR, "broooga", (linenr, keyword_tup[0]))
+        case "brsooga":
+            return Token(TokenTypes.CLOSEBR, "brsooga", (linenr, keyword_tup[0]))
+        case "fdooga":
+            return Token(TokenTypes.DEF, "fdooga", (linenr, keyword_tup[0]))
+        case "retooga":
+            return Token(TokenTypes.RETURN, "retooga", (linenr, keyword_tup[0]))
+        case match_input if re.fullmatch("[a-zA-Z]\w*", match_input):
+            return Token(TokenTypes.ID, keyword_tup[1], (linenr, keyword_tup[0]))
+        case match_input if match_input.isdigit():
+            return Token(TokenTypes.NUMBER, keyword_tup[1], (linenr, keyword_tup[0]))
 
 # lineToKeywords :: str -> List[Tuple[int,str]]
 @dcDecorator

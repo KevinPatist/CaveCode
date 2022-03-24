@@ -1,5 +1,6 @@
 from argparse import Action
 from inspect import stack
+from subprocess import call
 from types import NoneType
 from unittest import case
 from cave_runner import *
@@ -96,7 +97,7 @@ def prepVariableForComp(function_list: List[FunctionDefNode]) -> Tuple[Dict[str,
     return (var_dict)
 
 @dcDecorator
-def loadVar(var_name: str, load_pos: str, var_dict: Dict[str, CompVarNode], stack_offset: Optional[int]) -> str:
+def loadVar(var_name: str, load_pos: str, var_dict: Dict[str, CompVarNode]) -> str:
     """
     This function loads a variable from the stack into the given register load_pos
     """
@@ -118,17 +119,17 @@ def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) ->
     return return_string
 
 @dcDecorator
-def operatorNodeToAsm(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> str:
+def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode) -> str:
     """
     This function translates an OperatorNode into Assembly code
     """
     return_string = ""
     if isinstance(node.lhs.value, str):
-        return_string += loadVar(node.lhs.value, "R1", var_dict)
+        return_string += loadVar(node.lhs.value, "R1", calling_func.total_var_dict)
     else:
         return_string += "ldr R1, =" + str(node.lhs.value) + "\n\t"
     if isinstance(node.rhs.value, str):
-        return_string += loadVar(node.rhs.value, "R2", var_dict)
+        return_string += loadVar(node.rhs.value, "R2", calling_func.total_var_dict)
     else:
         return_string += "ldr R2, =" + str(node.rhs.value) + "\n\t"
     
@@ -179,7 +180,7 @@ def operatorNodeToAsm(node: OperatorNode, var_dict: Dict[str, CompVarNode]) -> s
     return return_string
 
 @dcDecorator
-def prepFunctionForComp(function: FunctionDefNode) -> Tuple[str, CompFuncNode]:
+def prepFunctionForComp(func_to_prep: FunctionDefNode) -> Tuple[str, CompFuncNode]:
     """
     This function turns a FunctionDefNode into Tuple[str, CompFuncNode]
     The CompFuncNode is an alternate FunctionDefNode specialised for use within the compiler
@@ -189,13 +190,13 @@ def prepFunctionForComp(function: FunctionDefNode) -> Tuple[str, CompFuncNode]:
     # Stack offset berekenen
     # alle vars plek geven zoals in addStackPointerToDict
     # var_dict naar de nieuwe func node gooien samen met stack offset
-    func_var_list = getVariableList(function)
+    func_var_list = getVariableList(func_to_prep)
     var_dict = addStackPointerToDict(func_var_list, 0)
     if isinstance(var_dict, NoneType):
         stack_reserved = "#0"
     else:
         stack_reserved = "#" + str(len(var_dict) * 4)
-    return (function.name, CompFuncNode(function, var_dict, stack_reserved))
+    return (func_to_prep.name, CompFuncNode(func_to_prep, var_dict, stack_reserved))
 
 @dcDecorator
 def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: int) -> Optional[List[str]]:
@@ -213,39 +214,50 @@ def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: in
         return_list.append(storeParams(function, parameter_list, rec_depth + 1))
         flat_list = list(reduce(lambda x, y: [x] + y, return_list))
         return flat_list
-        
+
 @dcDecorator
-def actionToAsm(action: ActionNode, function: CompFuncNode) -> str:
+def assignNodeToAsm(action: AssignNode, calling_func: CompFuncNode) -> str:
+    return_string = ""
+    if isinstance(action.value, OperatorNode):
+        return_string += operatorNodeToAsm(action.value, calling_func)
+    elif isinstance(action.value, VariableNode):
+        return_string += "ldr R0, =" + str(action.value.value) + "\n\t"
+    # else:
+        # Error: assign node krijgt geen correcte waarde geassigned
+    return_string += storeVar(action.name, "R0", calling_func.total_var_dict)
+
+@dcDecorator
+def actionToAsm(action: ActionNode, calling_func: CompFuncNode) -> str:
     return_string = ""
     match action:
         case isinstance(action, AssignNode):
-            return_string += assignNodeToAsm(action, function)
+            return_string += assignNodeToAsm(action, calling_func)
         case isinstance(action, IfOrWhileNode):
-            return_string += ifOrWhileNodeToAsm(action, function)
+            return_string += ifOrWhileNodeToAsm(action, calling_func)
         case isinstance(action, ReturnNode):
-            return_string += returnNodeToAsm(action, function)
+            return_string += returnNodeToAsm(action, calling_func)
 
 @dcDecorator
-def funcToAsm(function: CompFuncNode) -> str:
+def funcToAsm(func_to_convert: CompFuncNode) -> str:
     # set label
     # set stack offset so stack has reserved space
     # load parameter into it's spot
     # start the code
 
     # Setting function label
-    return_string = function.name + ":\n\t"
-    return_string += "add sp, sp, " + function.stack_offset + "\n\t"
+    return_string = func_to_convert.name + ":\n\t"
+    return_string += "add sp, sp, " + func_to_convert.stack_offset + "\n\t"
 
     # Storing Parameters/variables
-    if not isinstance(function.total_var_dict, NoneType):
-        func_param_list = [x for x in function.total_var_dict.keys()]
+    if not isinstance(func_to_convert.total_var_dict, NoneType):
+        func_param_list = [x for x in func_to_convert.total_var_dict.keys()]
     else:
         func_param_list = []
-    store_param_code_list = storeParams(function, func_param_list, 0)
+    store_param_code_list = storeParams(func_to_convert, func_param_list, 0)
     return_string += str(reduce(lambda x, y: x + y, store_param_code_list))
 
     # Creating function code
-    function_code_list = list(map(lambda x: actionToAsm(x, function), function.action_list))
+    function_code_list = list(map(lambda x: actionToAsm(x, func_to_convert), func_to_convert.action_list))
     print(function_code_list)
     return return_string
 
