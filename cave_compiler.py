@@ -1,42 +1,37 @@
 from argparse import Action
+from cProfile import label
 from inspect import stack
+from sre_parse import GLOBAL_FLAGS
 from subprocess import call
 from types import NoneType
 from unittest import case
 from cave_runner import *
 
-'''
-Stappen:
-functies neerzetten in dezelfde volgorde als in de code
-
-als variabele nodig voor functie: een load_variable gooien
-
-NIEUW:
-Functie zooi aanpassen:
-functies moeten aanhouden welke variabelen ze hebben
-en welke stack zooi ze daarbinnen hebben
-
-load_variable:
-vraagt: 
-- register to load to
-- variable name
-- variable to stack pointer dict
-
-die werkt zo:
-zet huidige stack pointer
-
-store_variable:
-om de variabele op te slaan op de plek waar die vandaan komt:
-- register to save from
-- variable name
-- variable to stack pointer dict
-'''
-
-    
 @dcDecorator
-def generateMainInit() -> str:
-    return_string = "true:\n\t"
-    return_string += "ldr R0, #1\n\t"
+def generateGlobalFuncLabel(func_to_globalise: CompFuncNode) -> str:
+    """
+    This function creates the .global label for the given function
+    This function is made for use within the generateMainInit function's map
+    """
+    return_string = ".global " + func_to_globalise.name + "\n"
+    return return_string
+
+@dcDecorator
+def generateMainInit(func_dict: Dict[str, CompFuncNode]) -> str:
+    """
+    This function generates some initialising code for the ASM file
+    It also creates a "true" label for branching to when a condition is true
+    """
+    return_string = ".text\n"
+    global_func_list = list(map(lambda x: generateGlobalFuncLabel(x), func_dict.values()))
+    if len(global_func_list) > 0:
+        if len(global_func_list) > 1:
+            return_string += str(reduce(lambda x, y: x + y, global_func_list))
+        else:
+            return_string += global_func_list[0]
+        return_string += "\n"
+    return_string += "true:\n\t"
+    return_string += "ldr R0, =1\n\t"
     return_string += "mov pc, lr\n\n"
     return return_string
 
@@ -102,9 +97,9 @@ def loadVar(var_name: str, load_pos: str, var_dict: Dict[str, CompVarNode]) -> s
     This function loads a variable from the stack into the given register load_pos
     """
     return_string = ""
-    return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
-    return_string += "ldr " + load_pos + ", [sp, #0]\n\t"
     return_string += "add sp, sp, " + var_dict[var_name].pointer + "\n\t"
+    return_string += "ldr " + load_pos + ", [sp, #0]\n\t"
+    return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
 @dcDecorator
@@ -113,13 +108,13 @@ def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) ->
     This function stores a variable from store_pos to it's assiged stack position
     """
     return_string = ""
-    return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
-    return_string += "str " + store_pos + ", [sp, #0]\n\t"
     return_string += "add sp, sp, " + var_dict[var_name].pointer + "\n\t"
+    return_string += "str " + store_pos + ", [sp, #0]\n\t"
+    return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
 @dcDecorator
-def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode) -> str:
+def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, in_conditional: bool=False) -> str:
     """
     This function translates an OperatorNode into Assembly code
     """
@@ -133,6 +128,11 @@ def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode) -> str:
     else:
         return_string += "ldr R2, =" + str(node.rhs.value) + "\n\t"
     
+    if in_conditional:
+        pointer_increase = 6
+    else:
+        pointer_increase = 5
+
     match node.operator:
         case TokenTypes.ADD:
             return_string += "add R0, R1, R2\n\t"
@@ -141,41 +141,41 @@ def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode) -> str:
         case TokenTypes.MUL:
             return_string += "mul R0, R1, R2\n\t"
         case TokenTypes.EQUALS:
-            return_string += "ldr R3, [pc, #5]\n\t"
+            return_string += "add R3, pc, #" + str(pointer_increase) + "\n\t"
             return_string += "mov lr, R3\n\t"
             return_string += "cmp R1, R2\n\t"
             return_string += "beq true\n\t"
-            return_string += "ldr R0, #0\n\n"
+            return_string += "ldr R0, =0\n\t"
         case TokenTypes.GREQ:
-            return_string += "ldr R3, [pc, #5]\n\t"
+            return_string += "add R3, pc, #" + str(pointer_increase) + "\n\t"
             return_string += "mov lr, R3\n\t"
             return_string += "cmp R1, R2\n\t"
             return_string += "bge true\n\t"
-            return_string += "ldr R0, #0\n\n"
+            return_string += "ldr R0, =0\n\t"
         case TokenTypes.LEEQ:
-            return_string += "ldr R3, [pc, #5]\n\t"
+            return_string += "add R3, pc, #" + str(pointer_increase) + "\n\t"
             return_string += "mov lr, R3\n\t"
             return_string += "cmp R1, R2\n\t"
             return_string += "ble true\n\t"
-            return_string += "ldr R0, #0\n\n"
+            return_string += "ldr R0, =0\n\t"
         case TokenTypes.LESSER:
-            return_string += "ldr R3, [pc, #5]\n\t"
+            return_string += "add R3, pc, #" + str(pointer_increase) + "\n\t"
             return_string += "mov lr, R3\n\t"
             return_string += "cmp R1, R2\n\t"
             return_string += "blt true\n\t"
-            return_string += "ldr R0, #0\n\n"
+            return_string += "ldr R0, =0\n\t"
         case TokenTypes.GREATER:
-            return_string += "ldr R3, [pc, #5]\n\t"
+            return_string += "add R3, pc, #" + str(pointer_increase) + "\n\t"
             return_string += "mov lr, R3\n\t"
             return_string += "cmp R1, R2\n\t"
             return_string += "bgt true\n\t"
-            return_string += "ldr R0, #0\n\n"
+            return_string += "ldr R0, =0\n\t"
         case TokenTypes.NOTEQUAL:
-            return_string += "ldr R3, [pc, #5]\n\t"
+            return_string += "add R3, pc, #" + str(pointer_increase) + "\n\t"
             return_string += "mov lr, R3\n\t"
             return_string += "cmp R1, R2\n\t"
             return_string += "bne true\n\t"
-            return_string += "ldr R0, 01\n\n"
+            return_string += "ldr R0, =1\n\t"
 
     return return_string
 
@@ -200,6 +200,9 @@ def prepFunctionForComp(func_to_prep: FunctionDefNode) -> Tuple[str, CompFuncNod
 
 @dcDecorator
 def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: int) -> Optional[List[str]]:
+    """
+    This function stores the parameters received by a function in their assigned registers.
+    """
     return_list = []
     if len(parameter_list) == 0:
         return None
@@ -216,7 +219,41 @@ def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: in
         return flat_list
 
 @dcDecorator
+def convertIfOrWhileToName(action: IfOrWhileNode, calling_func: CompFuncNode) -> str:
+    """
+    This function creates a name base to be used in assembly labels for if statements or while loops
+    """
+    return_string = ""
+    return_string += calling_func.name + "_"
+    match action.condition:
+        case action.condition if isinstance(action.condition, OperatorNode):
+            match action.condition.operator:
+                case TokenTypes.EQUALS:
+                    operator_string = "eqooga"
+                case TokenTypes.GREQ:
+                    operator_string = "greqooga"
+                case TokenTypes.LEEQ:
+                    operator_string = "leeqooga"
+                case TokenTypes.LESSER:
+                    operator_string = "lesooga"
+                case TokenTypes.GREATER:
+                    operator_string = "grooga"
+                case TokenTypes.NOTEQUAL:
+                    operator_string = "neqooga"        
+            return_string += str(action.condition.lhs.value) + "_" + operator_string + "_" + str(action.condition.rhs.value)
+        case action.condition if isinstance(action.condition, FunctionCallNode):
+            return_string += action.condition.name
+        case action.condition if isinstance(action.condition, VariableNode):
+            return_string += str(action.condition.value)
+    return return_string
+
+@dcDecorator
 def assignNodeToAsm(action: AssignNode, calling_func: CompFuncNode) -> str:
+    """
+    This function converts an AssignNode to assembly code.
+    It checks what kind of value is assigned to the variable and places that in R0
+    Then R0 is stored at the variable's stack position
+    """
     return_string = ""
     if isinstance(action.value, OperatorNode):
         return_string += operatorNodeToAsm(action.value, calling_func)
@@ -225,17 +262,68 @@ def assignNodeToAsm(action: AssignNode, calling_func: CompFuncNode) -> str:
     # else:
         # Error: assign node krijgt geen correcte waarde geassigned
     return_string += storeVar(action.name, "R0", calling_func.total_var_dict)
+    return return_string
+
+@dcDecorator
+def returnNodeToAsm(action: ReturnNode, calling_func: CompFuncNode) -> str:
+    return_string = ""
+    match action.return_value:
+        case action.return_value if isinstance(action.return_value, FunctionCallNode):
+            return_string += "bl " + action.return_value.function_name + "\n\t"
+        case action.return_value if isinstance(action.return_value, OperatorNode):
+            return_string += operatorNodeToAsm(action.return_value, calling_func)
+        case action.return_value if isinstance(action.return_value, VariableNode):
+            return_string += "ldr R0, =" + str(action.return_value.value) + "\n\t"
+    return_string += "b " + calling_func.name + "_end"
+    return return_string 
+
+@dcDecorator
+def ifOrWhileNodeToAsm(action: IfOrWhileNode, calling_func: CompFuncNode) -> str:
+    """
+    This function converts an IfOrWhileNode to assembly code
+    """
+    #============================================
+    # Coditional check en branchen naar eind if false
+    #============================================
+    return_string = ""
+    label_name_base = convertIfOrWhileToName(action, calling_func)
+    if action.is_loop:
+        return_string += "\n" + label_name_base + "_condition:\n\t"
+    else:
+        return_string += "\t"
+    
+    return_string += operatorNodeToAsm(action.condition, calling_func, True)
+    return_string += "cmp R0, #0\n\t"
+    return_string += "beq " + label_name_base + "_end\n\t"
+    
+    # actions omzetten in lijst met ASM code
+    action_code_list = list(map(lambda x: actionToAsm(x, calling_func), action.action_list))
+
+    # actions lijst omzetten tot code en bij retrun string toevoegen
+    actions_code = str(reduce(lambda x, y: x + y, action_code_list))
+    return_string += actions_code
+
+    # als node een while loop is het actie blok eindigen met branch naar condition label
+    if action.is_loop:
+        return_string += "b " + label_name_base + "_condition\n\t"
+    
+    # end label maken
+    return_string += "\n" + label_name_base + "_end:\n\t"
+
+    return return_string
 
 @dcDecorator
 def actionToAsm(action: ActionNode, calling_func: CompFuncNode) -> str:
     return_string = ""
     match action:
-        case isinstance(action, AssignNode):
+        case action if isinstance(action, AssignNode):
             return_string += assignNodeToAsm(action, calling_func)
-        case isinstance(action, IfOrWhileNode):
+        case action if isinstance(action, IfOrWhileNode):
             return_string += ifOrWhileNodeToAsm(action, calling_func)
-        case isinstance(action, ReturnNode):
+        case action if isinstance(action, ReturnNode):
             return_string += returnNodeToAsm(action, calling_func)
+
+    return return_string
 
 @dcDecorator
 def funcToAsm(func_to_convert: CompFuncNode) -> str:
@@ -246,7 +334,8 @@ def funcToAsm(func_to_convert: CompFuncNode) -> str:
 
     # Setting function label
     return_string = func_to_convert.name + ":\n\t"
-    return_string += "add sp, sp, " + func_to_convert.stack_offset + "\n\t"
+    return_string += "push {lr}\n\t"
+    return_string += "sub sp, sp, " + func_to_convert.stack_offset + "\n\t"
 
     # Storing Parameters/variables
     if not isinstance(func_to_convert.total_var_dict, NoneType):
@@ -254,80 +343,44 @@ def funcToAsm(func_to_convert: CompFuncNode) -> str:
     else:
         func_param_list = []
     store_param_code_list = storeParams(func_to_convert, func_param_list, 0)
-    return_string += str(reduce(lambda x, y: x + y, store_param_code_list))
+    if not isinstance(store_param_code_list, NoneType):
+        if len(store_param_code_list) > 1:
+            return_string += str(reduce(lambda x, y: x + y, store_param_code_list))
+        else:
+            return_string += store_param_code_list[0]
+        return_string += "\n"
 
     # Creating function code
     function_code_list = list(map(lambda x: actionToAsm(x, func_to_convert), func_to_convert.action_list))
-    print(function_code_list)
+    function_code_string = str(reduce(lambda x, y: x + y, function_code_list))
+    return_string += function_code_string
+
+    # creating end label with function end
+    return_string += "\n" + func_to_convert.name + "_end:\n\t"
+    return_string += "add sp, sp, " + func_to_convert.stack_offset + "\n\t"
+    return_string += "pop {pc}\n\n"
     return return_string
-
-
-
-    
 
 @dcDecorator
 def generateFullFunctionsCode(func_dict: Dict[str, CompFuncNode]) -> str:
     # call funcToAsm for all nodes in dict
     functions_code_list = list(map(funcToAsm, func_dict.values()))
-    print(functions_code_list)
+    full_functions_code = str(reduce(lambda x, y: x + y, functions_code_list))
+    return full_functions_code
 
-# @dcDecorator
-# def initVarToASM(var_dict: Dict[str, CompVarNode], dict_key: str) -> Tuple[str,str]:
-#     """ This function creates code to intialise a single variable """
-#     return_list = [""]
-#     return_list[0] = "\t"
-#     if isinstance(var_dict[dict_key].value, OperatorNode):
-#         return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-#         return_list[0] += "ldr r0, #0\n\t"
-#         return_list[0] += "str r0, [sp, #0]\n\t"
-#         return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
 
-#         return_list.append(var_dict[dict_key].name + ":\n\t")
-#         var_dict[dict_key].setAssignLabel(var_dict[dict_key].name)
-#         return_list[1] += operatorNodeToASM(var_dict[dict_key].value, var_dict)
-#         return_list[1] += storeVar(dict_key, "R0", var_dict)
-#         return_list[1] += "\n"
-
-#     else:
-#         return_list[0] += "sub sp, sp, " + var_dict[dict_key].pointer + "\n\t"
-#         return_list[0] += "ldr r0, #" + str(var_dict[dict_key].value) + "\n\t"
-#         return_list[0] += "str r0, [sp, #0]\n\t"
-#         return_list[0] += "add sp, sp, " + var_dict[dict_key].pointer + "\n"
-
-#     return return_list
-    
-# @dcDecorator
-# def sortVarInit(var_list: List[Union[str, List[str]]]) -> str:
-#     """
-#     This function takes the raw Variable initialisation code and processes it:
-#     The code is first sorted so the stack is filled accordingly.
-#     then the assign labels for operator variables is placed.
-#     The function puts the whole code segment ito combined_code and returns it.
-#     """
-#     var_init_list = [x[0] for x in var_list]
-#     var_init_list_list = [x[1] for x in var_list if len(x) > 1]
-#     combined_code = str(reduce(lambda x, y: x + y, var_init_list))
-#     combined_code += "\n"
-#     combined_code += str(reduce(lambda x, y: x + y, var_init_list_list))
-#     return combined_code
-
-# @dcDecorator
-# def initialiseVariables(var_dict: Dict[str, CompVarNode]) -> str:
-#     """ This function creates Assembly code to initialise variables """
-#     stack_reserved = "#" + str(len(var_dict)*4)
-#     var_init_code = "var_init:\n\tadd sp, sp, " + stack_reserved + "\n"
-#     # var_init_code_list = list(map(lambda var: initVarToASM(var_dict, var), var_dict.keys()))
-#     # sorted_var_init_code = sortVarInit(var_init_code_list)
-#     var_init_code += sorted_var_init_code
-#     return var_init_code
 
 @dcDecorator
 def caveCompiler(ast: List[FunctionDefNode]) -> str:
     func_dict_2 = dict(map(prepFunctionForComp, ast))
-    main_init_code = generateMainInit()
+    main_init_code = generateMainInit(func_dict_2)
     function_code = generateFullFunctionsCode(func_dict_2)
     final_code = main_init_code + function_code
-    print(final_code)
+    # print(final_code)
+    code_file = open('cave_code.asm', 'w')
+    code_file.write(final_code)
+    code_file.close()
+    return final_code
 
 
 
