@@ -89,3 +89,11 @@ brsooga
   - **Error-messaging:** geïmplementeerd door middel van de volgende error classes:
     - [ParseError](https://github.com/KevinPatist/CaveCode/blob/main/cave_parser.py#L3)
     - [RunnerError](https://github.com/KevinPatist/CaveCode/blob/main/cave_runner.py#L6)
+
+## Speciale regels:
+- De taal ondersteund geen globale variabelen
+- Je mag geen herhalende parameter/variabelen namen hebben in hetzelfde programma
+- De reken regels gaan van rechts naar links
+- Je mag geen variabelen aanmaken in loops of if statements
+- Je mag geen variabelen aanpassen buiten loops of if statements
+- Je kan niet delen als je de compiler editie gebruikt
