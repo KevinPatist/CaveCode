@@ -14,6 +14,6 @@ fdooga odd hoooga c hsooga broooga
     retooga even hoooga d hsooga booga
 brsooga
 
-fdooga main hoooga hsooga broooga
+fdooga asm_main hoooga hsooga broooga
     retooga odd hoooga 21 hsooga booga
 brsooga

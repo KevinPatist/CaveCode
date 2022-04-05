@@ -22,7 +22,7 @@ def generateMainInit(func_dict: Dict[str, CompFuncNode]) -> str:
     This function generates some initialising code for the ASM file
     It also creates a "true" label for branching to when a condition is true
     """
-    return_string = ".text\n"
+    return_string = ".cpu cortex-m0\n.text\n"
     global_func_list = list(map(lambda x: generateGlobalFuncLabel(x), func_dict.values()))
     if len(global_func_list) > 0:
         if len(global_func_list) > 1:
@@ -68,7 +68,7 @@ def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: in
     """ This fucntion updates a Dict to link variables to their reserved stack location. """
     if len(var_list) == 0:
         return None
-    pointer_int = (rec_depth + 1) * 4
+    pointer_int = (rec_depth) * 4
     pointer_str = '#' + str(pointer_int)
     return_dict = dict()
     if len(var_list) == 1:
@@ -129,9 +129,9 @@ def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, in_conditi
         return_string += "ldr R2, =" + str(node.rhs.value) + "\n\t"
     
     if in_conditional:
-        pointer_increase = 6
+        pointer_increase = 24
     else:
-        pointer_increase = 5
+        pointer_increase = 20
 
     match node.operator:
         case TokenTypes.ADD:

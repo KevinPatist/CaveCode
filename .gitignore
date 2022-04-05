@@ -1,0 +1,10 @@
+
+*.o
+_cc_flags
+_cpp_flags
+_linker_flags
+bmptk_fixed_size_stack.c
+main.elf
+main.ld
+main.map
+main.bin
