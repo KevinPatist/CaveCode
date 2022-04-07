@@ -140,11 +140,11 @@ def runner(ast: List[FunctionDefNode]) -> None:
     return None
 
 
-def main():
-    code = open("cave_code.txt", "r")
-    code_text = code.readlines()
-    code.close()
+# def main():
+#     code = open("cave_code.txt", "r")
+#     code_text = code.readlines()
+#     code.close()
 
-    print(runner(parser(caveLexer(code_text))))
+#     print(runner(parser(caveLexer(code_text))))
 
-main()
+# main()

@@ -15,5 +15,5 @@ fdooga odd hoooga c hsooga broooga
 brsooga
 
 fdooga cave_main hoooga hsooga broooga
-    retooga odd hoooga 21 hsooga booga
+    retooga odd hoooga 20 hsooga booga
 brsooga

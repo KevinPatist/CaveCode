@@ -4,12 +4,12 @@ extern "C" void print_int( int c ){
    hwlib::cout << c << "\n";
 }
 
-extern "C" void cave_main();
+extern "C" int cave_main();
 
 int main(void){
 
    hwlib::wait_ms(2000);
    hwlib::cout << "Program started\n";
-   cave_main();
+   hwlib::cout << cave_main();
    
 }

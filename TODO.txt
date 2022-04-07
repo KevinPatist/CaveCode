@@ -1,6 +1,6 @@
 INTERPRETER:
 - commenten       V
-- readme maken  V   
+- readme maken     V
 - turingcompleetheid aantonen:  V
     branching met shit erin V
     while loops die infinite kunnen tot max recursion depth of stack overflow V
