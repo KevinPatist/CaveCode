@@ -13,17 +13,17 @@ INTERPRETER:
 - video maken waarin ik de structuur uitleg van mn taal, interpreter en laat zien hoe die gebruikt wordt
 
 COMPILER:
-- variabelen getten
-- readme maken
-- Haskell zooi boven functies
-- COMMENTEN
+- variabelen getten V
+- readme maken V
+- Haskell zooi boven functies V
+- COMMENTEN V
 - Video maken
 - Unit tests in C++
 
 
 
 functionaliteiten:
-- HEEFT ERROR MESSAGING
+- HEEFT ERROR MESSAGING (IN INTERPRETER/PARSER)
 - 
 
 REGELS:
