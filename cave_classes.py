@@ -4,6 +4,7 @@ import os
 
 from enum import Enum
 from typing import Tuple, TypeVar, List, Type, Callable, Union, Optional, Dict
+from types import NoneType
 from functools import reduce
 from copy import deepcopy
 

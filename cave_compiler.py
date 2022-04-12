@@ -121,9 +121,9 @@ def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) ->
     return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
-# operatorNodeToAsm :: OperatorNode -> CompFuncNode -> bool=False -> str
+# operatorNodeToAsm :: OperatorNode -> CompFuncNode -> Optional[str]=None -> str
 @dcDecorator
-def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, in_conditional: bool=False) -> str:
+def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, conditional_name: Optional[str]=None) -> str:
     """
     This function translates an OperatorNode into Assembly code
     """
@@ -137,36 +137,54 @@ def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, in_conditi
     else:
         return_string += "mov R2, #" + str(node.rhs.value) + "\n\t"
     
-    if in_conditional:
-        pointer_increase = 6
+    if conditional_name is not None:
+        match node.operator:
+            case TokenTypes.EQUALS:
+                # return_string += "add R1, R1, #1\n\t"
+                return_string += "cmp R1, R2\n\t"
+                return_string += "bne " + conditional_name + "_end\n\t"
+            case TokenTypes.GREQ:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "blt " + conditional_name + "_end\n\t"
+            case TokenTypes.LEEQ:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "bgt " + conditional_name + "_end\n\t"
+            case TokenTypes.LESSER:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "bge " + conditional_name + "_end\n\t"
+            case TokenTypes.GREATER:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "ble " + conditional_name + "_end\n\t"
+            case TokenTypes.NOTEQUAL:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "beq " + conditional_name + "_end\n\t"
     else:
-        pointer_increase = 4
-
-    match node.operator:
-        case TokenTypes.ADD:
-            return_string += "add R0, R1, R2\n\t"
-        case TokenTypes.SUB:
-            return_string += "sub R0, R1, R2\n\t"
-        case TokenTypes.MUL:
-            return_string += "mul R0, R1, R2\n\t"
-        case TokenTypes.EQUALS:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "beq true\n\t"
-        case TokenTypes.GREQ:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "bge true\n\t"
-        case TokenTypes.LEEQ:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "ble true\n\t"
-        case TokenTypes.LESSER:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "blt true\n\t"
-        case TokenTypes.GREATER:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "bgt true\n\t"
-        case TokenTypes.NOTEQUAL:
-            return_string += "cmp R1, R2\n\t"
-            return_string += "bne true\n\t"
+        match node.operator:
+            case TokenTypes.ADD:
+                return_string += "add R0, R1, R2\n\t"
+            case TokenTypes.SUB:
+                return_string += "sub R0, R1, R2\n\t"
+            case TokenTypes.MUL:
+                return_string += "mul R1, R1, R2\n\t"
+                return_string += "mov R0, R1\n\t"
+            case TokenTypes.EQUALS:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "beq true\n\t"
+            case TokenTypes.GREQ:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "bge true\n\t"
+            case TokenTypes.LEEQ:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "ble true\n\t"
+            case TokenTypes.LESSER:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "blt true\n\t"
+            case TokenTypes.GREATER:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "bgt true\n\t"
+            case TokenTypes.NOTEQUAL:
+                return_string += "cmp R1, R2\n\t"
+                return_string += "bne true\n\t"
 
     return return_string
 
@@ -225,7 +243,7 @@ def giveParams(calling_func: CompFuncNode, parameter_list: List[Type[Node]], rec
         reg_str = "R" + str(rec_depth)
         parameter = parameter_list[0]
         if isinstance(parameter.content, int):
-            return_string += "mov " + reg_str + ", #" + str(parameter.content) + "\n\t"
+            return_string += "\n\tmov " + reg_str + ", #" + str(parameter.content) + "\n\t"
         else:
             return_string += loadVar(parameter.content, reg_str, calling_func.total_var_dict)
         return return_string
@@ -233,7 +251,7 @@ def giveParams(calling_func: CompFuncNode, parameter_list: List[Type[Node]], rec
         param_to_store = parameter_list.pop()
         reg_str = "R" + str(rec_depth)
         if isinstance(param_to_store.content, int):
-            return_string += "mov " + reg_str + ", #" + str(parameter.content) + "\n\t"
+            return_string += "\n\tmov " + reg_str + ", #" + str(parameter.content) + "\n\t"
         else:
             return_string += loadVar(parameter.content, reg_str, calling_func.total_var_dict)
         return_string += (giveParams(parameter_list, rec_depth + 1))
@@ -351,12 +369,12 @@ def ifOrWhileNodeToAsm(action: IfOrWhileNode, calling_func: CompFuncNode) -> str
     else:
         return_string += "\t"
     
-    return_string += operatorNodeToAsm(action.condition, calling_func, True)
-    if action.condition.operator == TokenTypes.NOTEQUAL:
-        return_string += "cmp R0, #0\n\t"
-    else:
-        return_string += "cmp R0, #1\n\t"
-    return_string += "bne " + label_name_base + "_end\n\t"
+    return_string += operatorNodeToAsm(action.condition, calling_func, label_name_base)
+    # if action.condition.operator == TokenTypes.NOTEQUAL:
+    #     return_string += "cmp R0, #0\n\t"
+    # else:
+    #     return_string += "cmp R0, #1\n\t"
+    # return_string += "bne " + label_name_base + "_end\n\t"
     
     # actions omzetten in lijst met ASM code
     action_code_list = list(map(lambda x: actionToAsm(x, calling_func), action.action_list))

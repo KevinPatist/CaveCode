@@ -28,7 +28,7 @@ recursieve functies:
 
 fdooga even hoooga a hsooga broooga
     ifooga hoooga a eqooga 0 hsooga broooga
-        retooga 0 booga
+        retooga 1 booga
     brsooga
     b isooga a mooga 1 booga
     retooga odd hoooga b hsooga booga
@@ -36,14 +36,14 @@ brsooga
 
 fdooga odd hoooga c hsooga broooga
     ifooga hoooga c eqooga 0 hsooga broooga
-        retooga 1 booga
+        retooga 0 booga
     brsooga
     d isooga c mooga 1 booga
     retooga even hoooga d hsooga booga
 brsooga
 
 fdooga cave_main hoooga hsooga broooga
-    retooga odd hoooga 21 hsooga booga
+    retooga odd hoooga 20 hsooga booga
 brsooga
 
 

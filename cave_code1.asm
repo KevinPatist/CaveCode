@@ -42,19 +42,19 @@ even:
 	
 	
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
-	mov R2, #0
-	cmp R1, R2
-	bne even_a_eqooga_0_end
-	mov R0, #1
+	mov R1, #0
+	cmp R0, R1
+	beq even_a_eqooga_0_end
+	mov R0, #0
 	b even_end
 even_a_eqooga_0_end:
 	
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
-	mov R2, #1
+	mov R1, #1
 	sub R0, R1, R2
 	
 	add sp, sp, #0
@@ -84,19 +84,19 @@ odd:
 	
 	
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
-	mov R2, #0
-	cmp R1, R2
-	bne odd_c_eqooga_0_end
-	mov R0, #0
+	mov R1, #0
+	cmp R0, R1
+	beq odd_c_eqooga_0_end
+	mov R0, #1
 	b odd_end
 odd_c_eqooga_0_end:
 	
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
-	mov R2, #1
+	mov R1, #1
 	sub R0, R1, R2
 	
 	add sp, sp, #0
@@ -133,18 +133,18 @@ mov R0, #0
 sommig_a_greqooga_1_condition:
 	
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
-	mov R2, #1
-	cmp R1, R2
+	mov R1, #1
+	cmp R0, R1
 	blt sommig_a_greqooga_1_end
 	
 	add sp, sp, #0
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #0
 	
 	add sp, sp, #4
-	ldr R2, [sp, #0]
+	ldr R1, [sp, #0]
 	sub sp, sp, #4
 	add R0, R1, R2
 	
@@ -153,9 +153,9 @@ sommig_a_greqooga_1_condition:
 	sub sp, sp, #0
 	
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
-	mov R2, #1
+	mov R1, #1
 	sub R0, R1, R2
 	
 	add sp, sp, #4
@@ -187,11 +187,11 @@ add_func:
 	
 
 	add sp, sp, #4
-	ldr R1, [sp, #0]
+	ldr R0, [sp, #0]
 	sub sp, sp, #4
 	
 	add sp, sp, #0
-	ldr R2, [sp, #0]
+	ldr R1, [sp, #0]
 	sub sp, sp, #0
 	add R0, R1, R2
 	b add_func_end
@@ -202,7 +202,7 @@ add_func_end:
 cave_unit1:
 	push {lr}
 	sub sp, sp, #0
-	mov R0, #1
+	mov R0, #2
 	bl odd
 	b cave_unit1_end
 cave_unit1_end:
@@ -212,7 +212,7 @@ cave_unit1_end:
 cave_unit2:
 	push {lr}
 	sub sp, sp, #0
-	mov R0, #127
+	mov R0, #2
 	bl odd
 	b cave_unit2_end
 cave_unit2_end:
@@ -332,8 +332,8 @@ cave_unit13_end:
 cave_unit14:
 	push {lr}
 	sub sp, sp, #0
-	mov R1, #1
-	mov R2, #2
+	mov R0, #1
+	mov R1, #2
 	add R0, R1, R2
 	b cave_unit14_end
 cave_unit14_end:
@@ -343,8 +343,8 @@ cave_unit14_end:
 cave_unit15:
 	push {lr}
 	sub sp, sp, #0
-	mov R1, #1
-	mov R2, #127
+	mov R0, #1
+	mov R1, #127
 	add R0, R1, R2
 	b cave_unit15_end
 cave_unit15_end:
@@ -354,8 +354,8 @@ cave_unit15_end:
 cave_unit16:
 	push {lr}
 	sub sp, sp, #0
+	mov R0, #1
 	mov R1, #1
-	mov R2, #1
 	sub R0, R1, R2
 	b cave_unit16_end
 cave_unit16_end:
@@ -365,8 +365,8 @@ cave_unit16_end:
 cave_unit17:
 	push {lr}
 	sub sp, sp, #0
-	mov R1, #1
-	mov R2, #2
+	mov R0, #1
+	mov R1, #2
 	sub R0, R1, R2
 	b cave_unit17_end
 cave_unit17_end:
@@ -376,8 +376,8 @@ cave_unit17_end:
 cave_unit18:
 	push {lr}
 	sub sp, sp, #0
-	mov R1, #1
-	mov R2, #3
+	mov R0, #1
+	mov R1, #3
 	mul R1, R1, R2
 	mov R0, R1
 	b cave_unit18_end
@@ -388,8 +388,8 @@ cave_unit18_end:
 cave_unit19:
 	push {lr}
 	sub sp, sp, #0
+	mov R0, #3
 	mov R1, #3
-	mov R2, #3
 	mul R1, R1, R2
 	mov R0, R1
 	b cave_unit19_end
