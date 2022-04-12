@@ -4,7 +4,7 @@ fdooga add_func hoooga a komooga b hsooga broooga
     retooga a plooga b booga
 brsooga
 
-fdooga asm_main hoooga hsooga broooga
+fdooga cave_main hoooga hsooga broooga
     ifooga hoooga 4 greqooga 2 hsooga broooga
         ifooga hoooga 5 lesooga 5 hsooga broooga
             retooga add_func hoooga 2 komooga 2 hsooga booga
@@ -42,7 +42,7 @@ fdooga odd hoooga c hsooga broooga
     retooga even hoooga d hsooga booga
 brsooga
 
-fdooga asm_main hoooga hsooga broooga
+fdooga cave_main hoooga hsooga broooga
     retooga odd hoooga 21 hsooga booga
 brsooga
 
@@ -58,6 +58,6 @@ fdooga sommig hoooga a hsooga broooga
     retooga result booga
 brsooga
 
-fdooga asm_main hoooga hsooga broooga
+fdooga cave_main hoooga hsooga broooga
     retooga sommig hoooga 5 hsooga booga
 brsooga

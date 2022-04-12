@@ -89,3 +89,44 @@ brsooga
   - **Error-messaging:** geïmplementeerd door middel van de volgende error classes:
     - [ParseError](https://github.com/KevinPatist/CaveCode/blob/main/cave_parser.py#L3)
     - [RunnerError](https://github.com/KevinPatist/CaveCode/blob/main/cave_runner.py#L6)
+
+## Speciale regels:
+- De taal ondersteund geen globale variabelen
+- Je mag geen herhalende parameter/variabelen namen hebben in hetzelfde programma
+- De reken regels gaan van rechts naar links
+- Je mag geen variabelen aanmaken in loops of if statements
+- Je mag geen variabelen aanpassen buiten loops of if statements
+- Je kan niet delen als je de compiler editie gebruikt
+
+# Gebruik van de taal:
+## Python 3.10:
+Binnen de interpreter en compiler worden functionaliteiten gebruikt die nieuw zijn in Python 3.10.
+Hierom is het dus nodig om je Python versie te updaten naar minimaal versie 3.10.
+
+## Code schrijven:
+De code die je schrijft moet je plaatsen in het bestand cave_code.txt om deze te gebruiken met de interpreter of compiler.
+
+## Interpreter gebruiken:
+Om de interpreter te gebruiken moet je het cave_runner.py bestand runnen met python.
+De interpreter geeft via de terminal/console het resultaat van de code.
+
+# CaveCode Compiler:
+## Hoe te compilen:
+### Hwlib:
+Om de compiler te gebruiken voor embedded systemen heb je de hwlib library nodig samen met zijn dependencies.
+Als je systeem runt op Linux kan je gebruik maken van [deze](https://github.com/wovo/installers) github repository om alles te installeren.
+Als je Windows runt moet je het handmatig installeren door de repositories die in [dit](https://github.com/wovo/installers/blob/master/ubuntu-20/ubuntu2) bestand worden gecloned, zelf te clonen in dezelfde hoofdmap.
+Voor Mac heb ik geen idee hoe je hwlib moet installeren.
+
+### Gebruik van compiler
+Voor je de compiler kan gebruiken moet je eerst in de Makefiles een paar dingen aanpassen:
+- Makefile.due:
+  - SERIAL_PORT: Hier moet je de poort van je arduino aangeven zodat deze geflasht kan worden
+  - RTOS: Hierin moet je het relatieve pad naar de RTOS map specificeren
+- Makefile.link:
+  - TI-SOFTWARE: Hier moet het relatieve pad naar de map met alle geclonede github repositories.
+
+Als je de compiler daadwerkelijk wil runnen kan dit door een terminal te openen in de CaveCode map.
+In deze terminal roep je de commando's make clean en make run aan.
+makefile aanroepen vanuit CaveCode map
+CaveCode code moet in cave_code.txt

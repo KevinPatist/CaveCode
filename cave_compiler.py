@@ -1,14 +1,6 @@
-from argparse import Action
-from cProfile import label
-from inspect import stack
-from sre_parse import GLOBAL_FLAGS
-from subprocess import call
-from types import NoneType
-from unittest import case
-
-from simplejson import load
 from cave_runner import *
 
+# generateGlobalFuncLabel :: CompFuncNode -> str
 @dcDecorator
 def generateGlobalFuncLabel(func_to_globalise: CompFuncNode) -> str:
     """
@@ -18,6 +10,7 @@ def generateGlobalFuncLabel(func_to_globalise: CompFuncNode) -> str:
     return_string = ".global " + func_to_globalise.name + "\n"
     return return_string
 
+# generateMainInit :: Dict[str, CompFuncNode] -> str
 @dcDecorator
 def generateMainInit(func_dict: Dict[str, CompFuncNode]) -> str:
     """
@@ -37,17 +30,26 @@ def generateMainInit(func_dict: Dict[str, CompFuncNode]) -> str:
     return_string += "mov pc, lr\n\n"
     return return_string
 
+# getNewVars :: ActionNode -> Optional[Tuple[str, int]]
 @dcDecorator
 def getNewVars(action: ActionNode) -> Optional[Tuple[str, int]]:
+    """
+    This function gets new variables made within a function and returns the list containing them
+    """
     if isinstance(action, AssignNode):
         return action.name, action.value
     else:
         return None
 
+# convertToNode :: Tuple[str, int] -> Tuple[str, CompVarNode]
 @dcDecorator
 def convertToNode(var_tup: Tuple[str, int]) -> Tuple[str, CompVarNode]:
+    """
+    This function converts a tuple to a CompVarNode
+    """
     return var_tup[0], CompVarNode(var_tup[0], var_tup[1])
 
+# getNewVariableList :: FunctionDefNode -> List[Tuple[str, CompVarNode]]
 @dcDecorator
 def getVariableList(function: FunctionDefNode) -> List[Tuple[str, CompVarNode]]:
     """ This function returns a list of all variables and parameters for the given function 
@@ -65,6 +67,7 @@ def getVariableList(function: FunctionDefNode) -> List[Tuple[str, CompVarNode]]:
     converted_var_list = list(map(convertToNode, filtered_var_list))
     return converted_var_list
 
+# addStackPointerToDict :: List[Tuple[str, CompVarNode]] -> int -> Optional[Dict[str, CompVarNode]]
 @dcDecorator
 def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: int) -> Optional[Dict[str, CompVarNode]]:
     """ This fucntion updates a Dict to link variables to their reserved stack location. """
@@ -83,6 +86,7 @@ def addStackPointerToDict(var_list: List[Tuple[str, CompVarNode]], rec_depth: in
         return_dict.update(addStackPointerToDict(var_list, rec_depth + 1))
     return return_dict
 
+# prepVariableForComp :: List[FunctionDefNode] -> Tuple[Dict[str, Union[OperatorNode, int]], Dict[str, str]]
 @dcDecorator
 def prepVariableForComp(function_list: List[FunctionDefNode]) -> Tuple[Dict[str, Union[OperatorNode, int]], Dict[str, str]]:
     """ This function returns a dict:
@@ -93,6 +97,7 @@ def prepVariableForComp(function_list: List[FunctionDefNode]) -> Tuple[Dict[str,
     var_dict = addStackPointerToDict(flat_var_list, 0)
     return (var_dict)
 
+# loadVar :: str -> str -> Dict[str, CompVarNode] -> str
 @dcDecorator
 def loadVar(var_name: str, load_pos: str, var_dict: Dict[str, CompVarNode]) -> str:
     """
@@ -104,6 +109,7 @@ def loadVar(var_name: str, load_pos: str, var_dict: Dict[str, CompVarNode]) -> s
     return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
+# storeVar :: str -> str -> Dict[str, CompVarNode] -> str
 @dcDecorator
 def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) -> str:
     """
@@ -115,6 +121,7 @@ def storeVar(var_name: str, store_pos: str, var_dict: Dict[str, CompVarNode]) ->
     return_string += "sub sp, sp, " + var_dict[var_name].pointer + "\n\t"
     return return_string
 
+# operatorNodeToAsm :: OperatorNode -> CompFuncNode -> bool=False -> str
 @dcDecorator
 def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, in_conditional: bool=False) -> str:
     """
@@ -163,6 +170,7 @@ def operatorNodeToAsm(node: OperatorNode, calling_func: CompFuncNode, in_conditi
 
     return return_string
 
+# prepFunctionForComp :: FunctionDefNode -> Tuple[str, CompFuncNode]
 @dcDecorator
 def prepFunctionForComp(func_to_prep: FunctionDefNode) -> Tuple[str, CompFuncNode]:
     """
@@ -182,6 +190,7 @@ def prepFunctionForComp(func_to_prep: FunctionDefNode) -> Tuple[str, CompFuncNod
         stack_reserved = "#" + str(len(var_dict) * 4)
     return (func_to_prep.name, CompFuncNode(func_to_prep, var_dict, stack_reserved))
 
+# storeParams :: CompFuncNode -> List[str] -> int -> Optional[List[str]]
 @dcDecorator
 def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: int) -> Optional[List[str]]:
     """
@@ -202,6 +211,35 @@ def storeParams(function: CompFuncNode, parameter_list: List[str], rec_depth: in
         flat_list = list(reduce(lambda x, y: [x] + y, return_list))
         return flat_list
 
+# giveParams :: CompFuncNode -> List[Type[Node]] -> int -> Optional[str]
+@dcDecorator
+def giveParams(calling_func: CompFuncNode, parameter_list: List[Type[Node]], rec_depth: int) -> Optional[str]:
+    """
+    This function places parameters for a function that is about to be called.
+    It places the parameters in registers so the function can store them
+    """
+    return_string = ""
+    if len(parameter_list) == 0:
+        return None
+    if len(parameter_list) == 1:
+        reg_str = "R" + str(rec_depth)
+        parameter = parameter_list[0]
+        if isinstance(parameter.content, int):
+            return_string += "mov " + reg_str + ", #" + str(parameter.content) + "\n\t"
+        else:
+            return_string += loadVar(parameter.content, reg_str, calling_func.total_var_dict)
+        return return_string
+    else:
+        param_to_store = parameter_list.pop()
+        reg_str = "R" + str(rec_depth)
+        if isinstance(param_to_store.content, int):
+            return_string += "mov " + reg_str + ", #" + str(parameter.content) + "\n\t"
+        else:
+            return_string += loadVar(parameter.content, reg_str, calling_func.total_var_dict)
+        return_string += (giveParams(parameter_list, rec_depth + 1))
+        return return_string
+
+# convertIfOrWhileToName :: IfOrWhileNode -> CompFuncNode -> str
 @dcDecorator
 def giveParams(calling_func: CompFuncNode, parameter_list: List[Type[Node]], rec_depth: int) -> Optional[str]:
     """
@@ -258,6 +296,7 @@ def convertIfOrWhileToName(action: IfOrWhileNode, calling_func: CompFuncNode) ->
             return_string += str(action.condition.value)
     return return_string
 
+# assignNodeToAsm :: AssignNode -> CompFuncNode -> str
 @dcDecorator
 def assignNodeToAsm(action: AssignNode, calling_func: CompFuncNode) -> str:
     """
@@ -275,8 +314,12 @@ def assignNodeToAsm(action: AssignNode, calling_func: CompFuncNode) -> str:
     return_string += storeVar(action.name, "R0", calling_func.total_var_dict)
     return return_string
 
+# returnNodeToAsm :: ReturnNode -> CompFuncNode -> str
 @dcDecorator
 def returnNodeToAsm(action: ReturnNode, calling_func: CompFuncNode) -> str:
+    """
+    This function creates Assembly code from a ReturnNode
+    """
     return_string = ""
     match action.return_value:
         case action.return_value if isinstance(action.return_value, FunctionCallNode):
@@ -292,6 +335,7 @@ def returnNodeToAsm(action: ReturnNode, calling_func: CompFuncNode) -> str:
     return_string += "b " + calling_func.name + "_end"
     return return_string 
 
+# ifOrWhileNodeToAsm :: IfOrWhileNode -> CompFuncNode -> str
 @dcDecorator
 def ifOrWhileNodeToAsm(action: IfOrWhileNode, calling_func: CompFuncNode) -> str:
     """
@@ -330,8 +374,12 @@ def ifOrWhileNodeToAsm(action: IfOrWhileNode, calling_func: CompFuncNode) -> str
 
     return return_string
 
+# actionToAsm :: ActionNode -> CompFuncNode -> str
 @dcDecorator
 def actionToAsm(action: ActionNode, calling_func: CompFuncNode) -> str:
+    """
+    This function turns an ActionNode to assembly code
+    """
     return_string = ""
     match action:
         case action if isinstance(action, AssignNode):
@@ -343,8 +391,12 @@ def actionToAsm(action: ActionNode, calling_func: CompFuncNode) -> str:
 
     return return_string
 
+# funcToAsm :: CompFuncNode -> str
 @dcDecorator
 def funcToAsm(func_to_convert: CompFuncNode) -> str:
+    """
+    This functionn turns a function into assembly code
+    """
     # set label
     # set stack offset so stack has reserved space
     # load parameter into it's spot
@@ -380,15 +432,18 @@ def funcToAsm(func_to_convert: CompFuncNode) -> str:
     return_string += "pop {pc}\n\n"
     return return_string
 
+# generateFullFunctionsCode :: Dict[str, CompFuncNode] -> str
 @dcDecorator
 def generateFullFunctionsCode(func_dict: Dict[str, CompFuncNode]) -> str:
+    """
+    This function turns a dict containing function nodes into assembly code
+    """
     # call funcToAsm for all nodes in dict
     functions_code_list = list(map(funcToAsm, func_dict.values()))
     full_functions_code = str(reduce(lambda x, y: x + y, functions_code_list))
     return full_functions_code
 
-
-
+# caveCompiler :: List[FunctionDefNode] -> str
 @dcDecorator
 def caveCompiler(ast: List[FunctionDefNode]) -> str:
     func_dict_2 = dict(map(prepFunctionForComp, ast))

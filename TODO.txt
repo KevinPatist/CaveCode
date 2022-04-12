@@ -1,6 +1,6 @@
 INTERPRETER:
 - commenten       V
-- readme maken     
+- readme maken     V
 - turingcompleetheid aantonen:  V
     branching met shit erin V
     while loops die infinite kunnen tot max recursion depth of stack overflow V
@@ -13,17 +13,17 @@ INTERPRETER:
 - video maken waarin ik de structuur uitleg van mn taal, interpreter en laat zien hoe die gebruikt wordt
 
 COMPILER:
-- variabelen getten
-- readme maken
-- Haskell zooi boven functies
-- COMMENTEN
+- variabelen getten V
+- readme maken V
+- Haskell zooi boven functies V
+- COMMENTEN V
 - Video maken
 - Unit tests in C++
 
 
 
 functionaliteiten:
-- HEEFT ERROR MESSAGING
+- HEEFT ERROR MESSAGING (IN INTERPRETER/PARSER)
 - 
 
 REGELS:
